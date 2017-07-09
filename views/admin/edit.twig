@@ -1,0 +1,30 @@
+<div class="site-index">
+    <form method="post">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-3">Username</div>
+                <div class="col-md-6"><input class="form-control" name="userName" type="text"
+                                             value="{{ model.userName }}"></div>
+            </div>
+            <div class="row">
+                <div class="col-md-3">Email</div>
+                <div class="col-md-6"><input class="form-control" name="email" type="text" value="{{ model.email }}">
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-3">Password</div>
+                <div class="col-md-6"><input class="form-control" name="password" type="text"
+                                             value="{{ model.password }}"></div>
+            </div>
+            <div class="row">
+                <div class="col-md-3">Proxy</div>
+                <div class="col-md-6"><input class="form-control" name="proxy" type="text" value="{{ model.proxy }}">
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-3"></div>
+                <div class="col-md-6"><input type="submit" class="btn btn-success" value="save"></div>
+            </div>
+        </div>
+    </form>
+</div>
