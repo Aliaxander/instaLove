@@ -96,7 +96,9 @@ class AdminController extends Controller
             'dbusername' => 'instaFollow',
             'dbpassword' => 'instaFollow',
         ]);
-        // $instaApi->setProxy($user->proxy);
+        if (!empty($user->proxy)) {
+            $instaApi->setProxy($user->proxy);
+        }
         $instaApi->setUser($user->userName, $user->password);
         if (!$instaApi->isLoggedIn) {
             try {
