@@ -2,6 +2,7 @@
 
 namespace app\controllers;
 
+use app\models\CheckTable;
 use app\models\Followings;
 use app\models\helpers\CheckpointException;
 use app\models\Scheduler;
@@ -27,7 +28,7 @@ class AdminController extends Controller
         if (Yii::$app->user->isGuest) {
             return $this->redirect("/");
         }
-    
+        
         return parent::beforeAction($action);
     }
     
@@ -45,7 +46,29 @@ class AdminController extends Controller
     {
         $scheduler = Scheduler::find()->where(['user' => Yii::$app->request->get('id')])->all();
         
-        return $this->render('scheduler.twig', ['schedulers' => $scheduler,'tasks'=>Task::getAll()]);
+        return $this->render('scheduler.twig',
+            ['schedulers' => $scheduler, 'tasks' => Task::getAll(), 'id' => Yii::$app->request->get('id')]);
+    }
+    
+    public function actionDelscheduler()
+    {
+        $model = Scheduler::findOne(Yii::$app->request->get('id'));
+        $model->delete();
+        
+        return $this->redirect(Yii::$app->request->referrer);
+    }
+    
+    public function actionAjaxAddScheduler()
+    {
+        if (Yii::$app->request->isPost) {
+            $data = new Scheduler();
+            $data->date = Yii::$app->request->post('date');
+            $data->task = Yii::$app->request->post('task');
+            $data->user = Yii::$app->request->post('user');
+            $data->save();
+        }
+        
+        return @$data->id;
     }
     
     public function actionSettings()
@@ -81,57 +104,29 @@ class AdminController extends Controller
     
     public function actionCheck()
     {
+        $countCheck = count(CheckTable::find()->where('status=0 and user=:user',
+            [':user' => Yii::$app->request->get('id')])->all());
         $model = Followings::findAll(['userId' => Yii::$app->request->get('id')]);
         
-        if (count($model) === 0 && empty(Yii::$app->request->get('check'))) {
+        if (count($model) === 0 && empty(Yii::$app->request->get('check')) and $countCheck == 0) {
             return $this->redirect('/admin/recheck/?id=' . Yii::$app->request->get('id'));
         }
         
         
-        return $this->render('follow.twig', ['users' => $model, 'id' => Yii::$app->request->get('id')]);
+        return $this->render('follow.twig', [
+            'users' => $model,
+            'id' => Yii::$app->request->get('id'),
+            'countCheck' => $countCheck
+        ]);
     }
     
     
     public function actionRecheck()
     {
-        $user = Users::findOne(Yii::$app->request->get('id'));
-        
-        $instaApi = new Instagram(false, false, [
-            'storage' => 'mysql',
-            'dbhost' => 'localhost',
-            'dbname' => 'insta',
-            'dbusername' => 'insta',
-            'dbpassword' => 'mPF4F6n6lAyor3KZ',
-        ]);
-        if (!empty($user->proxy)) {
-            $instaApi->setProxy($user->proxy);
-        }
-        $instaApi->setUser($user->userName, $user->password);
-        if (!$instaApi->isLoggedIn) {
-            try {
-                $instaApi->login(true);
-            } catch (\Exception $error) {
-                new CheckpointException($user, $error->getMessage());
-            }
-        }
-        $result = $instaApi->getSelfUsersFollowing();
-        //print_r($result->users);
-        
-        foreach ($result->users as $user) {
-            $model = new Followings();
-            $model->token = Yii::$app->request->get('id') . '_' . $user->pk;
-            $model->userId = Yii::$app->request->get('id');
-            $model->followId = $user->pk;
-            $model->profile_pic_url = $user->profile_pic_url;
-            $model->username = $user->username;
-            $model->full_name = $user->full_name;
-            try {
-                $model->save();
-            } catch (Exception $e) {
-                $model->isNewRecord = false;
-                $model->save();
-            }
-        }
+        $task = new CheckTable();
+        $task->status = 0;
+        $task->user = Yii::$app->request->get('id');
+        $task->save();
         
         return $this->redirect("/admin/check/?heck=true&id=" . Yii::$app->request->get('id'));
     }

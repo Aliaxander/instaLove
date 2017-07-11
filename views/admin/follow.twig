@@ -1,29 +1,33 @@
 <div class="site-index">
     <div class="container">
-        <a href="/admin/recheck/?id={{ id }}" class="btn btn-default">Refresh</a>
+        {% if countCheck>0 %}
+            Checked now... Please, wait.
+        {% else %}
+            <a href="/admin/recheck/?id={{ id }}" class="btn btn-default">Refresh</a>
+        {% endif %}
         <table class="table table-hover table-striped">
-        {% for user in users %}
-            <tr>
-                <td><img src="{{ user.profile_pic_url }}" width="50px"></td>
-                <td>{{ user.username }}</td>
-                <td id="check-{{ user.id }}">
-                    {% if user.status==0 %}
-                        <a href="javascript:;" onclick="follow({{ user.id }});"><i class="fa fa-square-o"></i></a>
-                    {% else %}
-                        <a href="javascript:;" onclick="unFollow({{ user.id }});"><i class="fa fa-check-square"></i></a>
-                    {% endif %}
-                </td>
-                <td id="check-{{ user.id }}">
-                    {% if user.status==1 %}
-                        {% if user.isComplete==0 %}
-                            <i class="fa fa-clock-o"></i>
+            {% for user in users %}
+                <tr>
+                    <td><img src="{{ user.profile_pic_url }}" width="50px"></td>
+                    <td>{{ user.username }}</td>
+                    <td id="check-{{ user.id }}">
+                        {% if user.status==0 %}
+                            <a href="javascript:;" onclick="follow({{ user.id }});"><i class="fa fa-square-o"></i></a>
                         {% else %}
-                            <i class="fa fa-check-circle-o"></i>
+                            <a href="javascript:;" onclick="unFollow({{ user.id }});"><i class="fa fa-check-square"></i></a>
                         {% endif %}
-                    {% endif %}
-                </td>
-            </tr>
-        {% endfor %}
+                    </td>
+                    <td id="check-{{ user.id }}">
+                        {% if user.status==1 %}
+                            {% if user.isComplete==0 %}
+                                <i class="fa fa-clock-o"></i>
+                            {% else %}
+                                <i class="fa fa-check-circle-o"></i>
+                            {% endif %}
+                        {% endif %}
+                    </td>
+                </tr>
+            {% endfor %}
         </table>
     </div>
 </div>

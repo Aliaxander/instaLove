@@ -5,17 +5,17 @@ namespace app\models;
 use yii\db\ActiveRecord;
 
 /**
- * Class Scheduler
+ * Class CheckTable
  *
  * @package app\models
  */
-class Scheduler extends ActiveRecord
+class CheckTable extends ActiveRecord
 {
     /**
      * @return string
      */
     public static function tableName()
     {
-        return 'scheduler';
+        return 'checkTable';
     }
 }
