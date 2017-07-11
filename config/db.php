@@ -2,8 +2,8 @@
 
 return [
     'class' => 'yii\db\Connection',
-    'dsn' => 'mysql:host=164.132.168.121;dbname=instaFollow',
-    'username' => 'instaFollow',
-    'password' => 'instaFollow',
+    'dsn' => 'mysql:host=localhost;dbname=insta',
+    'username' => 'insta',
+    'password' => 'mPF4F6n6lAyor3KZ',
     'charset' => 'utf8',
 ];
