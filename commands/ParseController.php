@@ -78,6 +78,7 @@ class ParseController extends Controller
             try {
                 $model->save();
             } catch (\Exception $e) {
+                print_r($e->getMessage());
                 $model->isNewRecord = false;
                 $model->save();
             }
