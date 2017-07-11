@@ -1,0 +1,58 @@
+<table class="table table-hover table-striped">
+    <thead>
+    <tr class="active">
+        <td>Date</td>
+        <td>Task</td>
+        <td>Status</td>
+        <td></td>
+    </tr>
+    </thead>
+    {% for scheduler in schedulers %}
+        <tr>
+            <td>{{ scheduler.date }}</td>
+            <td>
+                {% if scheduler.task==2 %}
+                    Follow/Unfollow
+                {% endif %}
+            </td>
+            <td>
+                {% if scheduler.status==0 %}
+                    Scheduled
+                {% else %}
+                    Completed
+                {% endif %}
+            </td>
+            <td>
+                <a onclick="return confirm('Confirm delere {{ tasks[scheduler.task] }} {{ scheduler.date }}');"
+                   href="/admin/delscheduler/?id={{ scheduler.id }}"><i class="fa fa-trash" aria-hidden="true"></i></a>
+            </td>
+        </tr>
+    {% endfor %}
+</table>
+<hr>
+    <div class="row">
+        <div class="col-md-3"><select class="form-control" name="task">
+                <option value="2">Follow</option>
+            </select></div>
+    </div>
+    <div class="row">
+        <div class="col-md-3">
+            <input class="form-control" name="date" id="datetimepicker">
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-3">
+            <input class="btn btn-success" type="submit" value="Add" onclick="add();return false;">
+        </div>
+    </div>
+
+{% set cs = App.getClientScript %}
+{{ cs.registerScriptFile('/path/to/js/yourscript.js') }}
+
+{% set script %}
+    $('#datetimepicker').datetimepicker({
+    locale: 'ru'
+    });
+{% endset %}
+
+{{ this.registerJs(script,4,'datetimepicker') }}

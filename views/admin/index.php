@@ -1,6 +1,4 @@
-<div class="site-index">
-	<div class="container">
-		<table class="table table-striped table-hover">
+	<table class="table table-striped table-hover">
 			<thead>
 			<tr class="active">
 				<td>id</td>
@@ -27,7 +25,7 @@
 						<td><?= $user->proxy ?></td>
 						<td><?= Status::findIdentity($user->status) ?></td>
 						<td style="width: 220px;"><?= Task::findIdentity($user->task) ?></td>
-						<td style="width: 140px;">
+						<td style="width: 160px;">
                             <?php
                             if ($user->task == 1) {
                                 ?>
@@ -46,6 +44,9 @@
 							<a class="btn btn-xs btn-default" href="/admin/edit/?id=<?= $user->id ?>"><i
 										class="fa fa-pencil"
 										aria-hidden="true"></i></a>
+							<a class="btn btn-xs btn-default" href="/admin/scheduler/?id=<?= $user->id ?>"><i
+										class="fa fa-calendar"
+										aria-hidden="true"></i></a>
 							<a class="btn btn-xs btn-default" href="/admin/check/?id=<?= $user->id ?>"><i
 										class="fa fa-users" aria-hidden="true"></i></a>
 							<a class="btn btn-xs btn-danger"
@@ -61,5 +62,3 @@
 			</tbody>
 		</table>
 		<a href="/admin/addbot" class="btn btn-default">Add bot</a>
-	</div>
-</div>

@@ -4,8 +4,10 @@ namespace app\controllers;
 
 use app\models\Followings;
 use app\models\helpers\CheckpointException;
+use app\models\Scheduler;
 use app\models\Settings;
 use app\models\Status;
+use app\models\Task;
 use app\models\Users;
 use InstagramAPI\Instagram;
 use Yii;
@@ -20,25 +22,34 @@ use yii\web\Response;
  */
 class AdminController extends Controller
 {
+    public function beforeAction($action)
+    {
+        if (Yii::$app->user->isGuest) {
+            return $this->redirect("/");
+        }
+    
+        return parent::beforeAction($action);
+    }
+    
     /**
      * @return string|Response
      */
     public function actionIndex()
     {
-        if (Yii::$app->user->isGuest) {
-            return $this->redirect("/");
-        }
         $users = Users::find()->all();
         
         return $this->render('index', ['users' => $users, 'status' => Status::getAll()]);
     }
     
+    public function actionScheduler($id)
+    {
+        $scheduler = Scheduler::find()->where(['user' => Yii::$app->request->get('id')])->all();
+        
+        return $this->render('scheduler.twig', ['schedulers' => $scheduler,'tasks'=>Task::getAll()]);
+    }
+    
     public function actionSettings()
     {
-        if (Yii::$app->user->isGuest) {
-            return $this->redirect("/");
-        }
-        
         if (Yii::$app->request->isPost) {
             foreach (Yii::$app->request->post() as $key => $val) {
                 $data = Settings::findOne($key);
@@ -70,10 +81,6 @@ class AdminController extends Controller
     
     public function actionCheck()
     {
-        if (Yii::$app->user->isGuest) {
-            return $this->redirect("/");
-        }
-        
         $model = Followings::findAll(['userId' => Yii::$app->request->get('id')]);
         
         if (count($model) === 0 && empty(Yii::$app->request->get('check'))) {
@@ -131,9 +138,6 @@ class AdminController extends Controller
     
     public function actionDel()
     {
-        if (Yii::$app->user->isGuest) {
-            return $this->redirect("/");
-        }
         $model = Users::findOne(Yii::$app->request->get('id'));
         $model->delete();
         
@@ -142,10 +146,6 @@ class AdminController extends Controller
     
     public function actionEdit()
     {
-        if (Yii::$app->user->isGuest) {
-            return $this->redirect("/");
-        }
-        
         $model = Users::findOne(Yii::$app->request->get('id'));
         if (Yii::$app->request->isPost) {
             $model->userName = Yii::$app->request->post('userName');
@@ -162,10 +162,6 @@ class AdminController extends Controller
     
     public function actionAddbot()
     {
-        if (Yii::$app->user->isGuest) {
-            return $this->redirect("/");
-        }
-        
         $model = new Users();
         if (Yii::$app->request->isPost) {
             $model->userName = Yii::$app->request->post('userName');

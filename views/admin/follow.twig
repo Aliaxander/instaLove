@@ -6,7 +6,6 @@
             <tr>
                 <td><img src="{{ user.profile_pic_url }}" width="50px"></td>
                 <td>{{ user.username }}</td>
-                <td>{{ user.full_name }}</td>
                 <td id="check-{{ user.id }}">
                     {% if user.status==0 %}
                         <a href="javascript:;" onclick="follow({{ user.id }});"><i class="fa fa-square-o"></i></a>
