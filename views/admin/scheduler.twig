@@ -62,6 +62,9 @@
                     $('tbody').append('<tr><td>' + date + '</td><td>Follow/Unfollow</td><td>Scheduled</td><td><a onclick="return confirm(\'Confirmdelere\');" href="/admin/delscheduler/?id=' + result + '"><i class="fa fa-trash" aria-hidden="true"></i></a></td></tr>');
                 }
                 $("#submit").val('Add').prop("disabled", false);
+            },
+            error: function () {
+                $("#submit").val('Add').prop("disabled", false);
             }
         });
 

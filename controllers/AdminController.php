@@ -38,7 +38,6 @@ class AdminController extends Controller
     public function actionIndex()
     {
         $users = Users::find()->all();
-        
         return $this->render('index', ['users' => $users, 'status' => Status::getAll()]);
     }
     
