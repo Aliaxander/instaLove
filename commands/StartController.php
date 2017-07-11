@@ -37,10 +37,10 @@ class StartController extends Controller
             //InstagramLogic:
             $instaApi = new Instagram(false, false, [
                 'storage' => 'mysql',
-                'dbhost' => '164.132.168.121',
-                'dbname' => 'instaFollow',
-                'dbusername' => 'instaFollow',
-                'dbpassword' => 'instaFollow',
+                'dbhost' => 'localhost',
+                'dbname' => 'insta',
+                'dbusername' => 'insta',
+                'dbpassword' => 'mPF4F6n6lAyor3KZ',
             ]);
             if (!empty($user->proxy)) {
                 $instaApi->setProxy($user->proxy);
