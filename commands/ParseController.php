@@ -23,6 +23,8 @@ use yii\console\Controller;
  */
 class ParseController extends Controller
 {
+    public $id;
+    
     public function actionIndex()
     {
         $tasks = CheckTable::find()->where("status=0")->all();
@@ -30,8 +32,8 @@ class ParseController extends Controller
             foreach ($tasks as $task) {
                 $task->status = 1;
                 $task->update();
-                
-                $user = Users::findOne($task->user);
+                $this->id = $task->user;
+                $user = Users::findOne($this->id);
                 
                 $instaApi = new Instagram(false, false, [
                     'storage' => 'mysql',
@@ -67,8 +69,8 @@ class ParseController extends Controller
         //print_r($result->users);
         foreach ($result->users as $user) {
             $model = new Followings();
-            $model->token = \Yii::$app->request->get('id') . '_' . $user->pk;
-            $model->userId = \Yii::$app->request->get('id');
+            $model->token = $this->id . '_' . $user->pk;
+            $model->userId = $this->id;
             $model->followId = $user->pk;
             $model->profile_pic_url = $user->profile_pic_url;
             $model->username = $user->username;
