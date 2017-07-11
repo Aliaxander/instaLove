@@ -60,6 +60,6 @@
             ?>
 			</tbody>
 		</table>
-		<a href="/admin/addbot" class="btn btn-default">Add bot</a>
+		<a href="/admin/addbot" class="btn btn-default">Add account</a>
 	</div>
 </div>
