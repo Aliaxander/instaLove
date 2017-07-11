@@ -66,7 +66,7 @@ class ParseController extends Controller
     {
         $result = $instaApi->getSelfUsersFollowing($page);
         
-        //print_r($result->users);
+        print_r($result->users);
         foreach ($result->users as $user) {
             $model = new Followings();
             $model->token = $this->id . '_' . $user->pk;
