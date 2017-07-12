@@ -56,7 +56,7 @@ class StartController extends Controller
                     $user->status = 1;
                     $user->update();
                 } catch (\Exception $error) {
-                    new CheckpointException($user, $error->getMessage());
+                    throw new CheckpointException($user, $error->getMessage());
                 }
             }
             

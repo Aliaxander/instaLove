@@ -33,7 +33,7 @@ class ParseController extends Controller
                 $this->id = $task->user;
                 $user = Users::findOne($this->id);
                 
-                $instaApi = new Instagram(false, false, [
+                $instaApi = new Instagram(true, true, [
                     'storage' => 'mysql',
                     'dbhost' => 'localhost',
                     'dbname' => 'insta',
@@ -50,7 +50,7 @@ class ParseController extends Controller
                         $user->status = 1;
                         $user->update();
                     } catch (\Exception $error) {
-                        new CheckpointException($user, $error->getMessage());
+                        throw new CheckpointException($user, $error->getMessage());
                     }
                 }
                 $this->parse($instaApi);
