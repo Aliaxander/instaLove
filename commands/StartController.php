@@ -104,6 +104,14 @@ class StartController extends Controller
                 $this->followUnfollow($instaApi, $accountId, $isFollow);
             } else {
                 $message = $error->getMessage();
+                \Yii::$app->mailer->compose()
+                    ->setFrom('insta@allsoft.com')
+                    ->setTo('to@domain.com')
+                    ->setSubject('Insta ERROR')
+                    ->setTextBody('Connection error | ' . $this->user->userName . ' | ' . $message)
+                    ->send();
+                
+                
                 throw new CheckpointException($this->user, $message);
             }
         }
