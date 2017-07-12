@@ -68,7 +68,6 @@ class ParseController extends Controller
                             throw new CheckpointException($user, $error->getMessage());
                         }
                     }
-                    
                 }
             }
         }

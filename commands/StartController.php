@@ -90,6 +90,14 @@ class StartController extends Controller
                 $instaApi->unfollow($accountId);
             }
         } catch (\Exception $error) {
+            if ($error->getMessage() === 'InstagramAPI\Response\FollowerAndFollowingResponse: login_required.') {
+                try {
+                    $instaApi->login(true);
+                } catch (\Exception $error) {
+                    throw new CheckpointException($this->user, $error->getMessage());
+                }
+            }
+            
             $this->countError++;
             if ($this->countError <= 5) {
                 sleep(60);
