@@ -50,7 +50,17 @@ class ParseController extends Controller
                         $user->status = 1;
                         $user->update();
                     } catch (\Exception $error) {
-                        throw new CheckpointException($user, $error->getMessage());
+                        if ($error->getMessage() === 'InstagramAPI\Exception\LoginRequiredException\' with message \'InstagramAPI\Response\FollowerAndFollowingResponse: login_required.') {
+                            try {
+                                $instaApi->login(true);
+                                $user->status = 1;
+                                $user->update();
+                            } catch (\Exception $error) {
+                                throw new CheckpointException($user, $error->getMessage());
+                            }
+                        } else {
+                            throw new CheckpointException($user, $error->getMessage());
+                        }
                     }
                 }
                 $this->parse($instaApi);
