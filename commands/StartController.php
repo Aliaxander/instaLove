@@ -106,7 +106,7 @@ class StartController extends Controller
                 $message = $error->getMessage();
                 \Yii::$app->mailer->compose()
                     ->setFrom('insta@allsoft.com')
-                    ->setTo('to@domain.com')
+                    ->setTo('megroup@iinet.net.au')
                     ->setSubject('Insta ERROR')
                     ->setTextBody('Connection error | ' . $this->user->userName . ' | ' . $message)
                     ->send();
