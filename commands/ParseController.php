@@ -10,8 +10,6 @@ namespace app\commands;
 use app\models\CheckTable;
 use app\models\Followings;
 use app\models\helpers\CheckpointException;
-use app\models\Scheduler;
-use app\models\Settings;
 use app\models\Users;
 use InstagramAPI\Instagram;
 use yii\console\Controller;
@@ -49,6 +47,8 @@ class ParseController extends Controller
                 if (!$instaApi->isLoggedIn) {
                     try {
                         $instaApi->login(true);
+                        $user->status = 1;
+                        $user->update();
                     } catch (\Exception $error) {
                         new CheckpointException($user, $error->getMessage());
                     }
@@ -59,7 +59,7 @@ class ParseController extends Controller
     }
     
     /**
-     * @param $instaApi
+     * @param $instaApi \InstagramAPI\Instagram
      * @param $page
      */
     protected function parse($instaApi, $page = null)

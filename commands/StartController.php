@@ -21,6 +21,9 @@ use yii\console\Controller;
  */
 class StartController extends Controller
 {
+    protected $countError = 0;
+    protected $user;
+    
     public function actionIndex()
     {
         $settingsTmp = Settings::find()->all();
@@ -29,6 +32,7 @@ class StartController extends Controller
             $settings[$row->id] = $row->value;
         }
         $user = Users::find()->where(['task' => 2])->one();
+        $this->user = $user;
         if (count($user) === 1) {
             $user->task = 3;
             $user->update();
@@ -49,6 +53,8 @@ class StartController extends Controller
             if (!$instaApi->isLoggedIn) {
                 try {
                     $instaApi->login(true);
+                    $user->status = 1;
+                    $user->update();
                 } catch (\Exception $error) {
                     new CheckpointException($user, $error->getMessage());
                 }
@@ -59,14 +65,39 @@ class StartController extends Controller
                 $follow = Followings::find()->where(['id' => $row->id])->one();
                 $follow->isComplete = 1;
                 $follow->save();
-                $instaApi->unfollow($row->followId);
+                $this->followUnfollow($instaApi, $row->followId, 0);
                 sleep(random_int($settings[1], $settings[2]));
-                $instaApi->follow($row->followId);
+                $this->followUnfollow($instaApi, $row->followId, 1);
                 sleep(random_int($settings[1], $settings[2]));
             }
             $user->task = 1;
             $user->update();
             Followings::updateAll(['isComplete' => 0], ['userId' => $user->id]);
+        }
+    }
+    
+    /**
+     * @param $instaApi \InstagramAPI\Instagram
+     * @param $accountId
+     * @param $isFollow
+     */
+    protected function followUnfollow($instaApi, $accountId, $isFollow)
+    {
+        try {
+            if ($isFollow) {
+                $instaApi->follow($accountId);
+            } else {
+                $instaApi->unfollow($accountId);
+            }
+        } catch (\Exception $error) {
+            $this->countError++;
+            if ($this->countError <= 5) {
+                sleep(60);
+                $this->followUnfollow($instaApi, $accountId, $isFollow);
+            } else {
+                $message = $error->getMessage();
+                throw new CheckpointException($this->user, $message);
+            }
         }
     }
 }
