@@ -91,6 +91,7 @@ class StartController extends Controller
             }
         } catch (\Exception $error) {
             echo $error->getMessage();
+            print_r($error);
             if ($error->getMessage() === 'InstagramAPI\Response\FollowerAndFollowingResponse: login_required.') {
                 try {
                     $instaApi->login(true);
