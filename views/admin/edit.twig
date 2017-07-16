@@ -1,5 +1,6 @@
 <div class="site-index">
     <form method="post">
+        <div class="label label-danger">{{ error }}</div>
         <div class="container">
             <div class="row">
                 <div class="col-md-3">Username</div>
@@ -20,6 +21,7 @@
                 <div class="col-md-3">Proxy</div>
                 <div class="col-md-6"><input class="form-control" name="proxy" type="text" value="{{ model.proxy }}">
                 </div>
+                <div class="col-md-1">{{ proxySpeed }}ms</div>
             </div>
             <div class="row">
                 <div class="col-md-3"></div>

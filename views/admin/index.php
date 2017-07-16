@@ -15,8 +15,7 @@
     <?php
     use app\models\Followings;
     use app\models\Status;
-    use app\models\Task;
-    
+
     if (!empty($users)) {
         foreach ($users as $user) {
             ?>
@@ -26,7 +25,9 @@
 				<td><?= $user->userName ?></td>
 				<td><?= $user->proxy ?></td>
 				<td><?= Status::findIdentity($user->status) ?></td>
-				<td style="width: 220px;"><?= Task::findIdentity($user->task) ?></td>
+				<td style="width: 220px;">
+                    <?= $user->task ?>
+				</td>
 				<td>
                     <?php
                     $progress1 = count(Followings::find()->where('userId=:user and status=1',

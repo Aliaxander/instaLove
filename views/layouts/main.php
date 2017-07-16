@@ -40,7 +40,7 @@ AppAsset::register($this);
         'options' => ['class' => 'navbar-nav navbar-right'],
         'items' => [
             ['label' => 'Home', 'url' => ['/site/index']],
-            !Yii::$app->user->isGuest ? ['label' => 'Admin', 'url' => ['/admin']] : (''),
+            !Yii::$app->user->isGuest ? ['label' => 'Dashboard', 'url' => ['/admin']] : (''),
             !Yii::$app->user->isGuest ? ['label' => 'Settings', 'url' => ['/admin/settings']] : (''),
             Yii::$app->user->isGuest ? (
             ['label' => 'Login', 'url' => ['/site/login']]

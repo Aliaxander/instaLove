@@ -10,7 +10,14 @@
     <tbody>
     {% for scheduler in schedulers %}
         <tr>
-            <td>{{ scheduler.date }}</td>
+            <td id="editTd-{{ scheduler.id }}">
+                {% if scheduler.status==0 %}
+                    <div id="edit-{{ scheduler.id }}"
+                         onclick="edit({{ scheduler.id }})">{{ scheduler.date|date("m-d-Y h:i") }}</div>
+                {% else %}
+                    {{ scheduler.date|date("m-d-Y h:i") }}
+                {% endif %}
+            </td>
             <td>
                 {% if scheduler.task==2 %}
                     Follow/Unfollow
@@ -35,6 +42,7 @@
 <div class="row">
     <div class="col-md-3"><select class="form-control" name="task">
             <option value="2">Follow</option>
+            <option value="4">ML no follow</option>
         </select></div>
 </div>
 <div class="row">
@@ -69,13 +77,34 @@
         });
 
     }
-</script>
+    function edit(id) {
+        if (id) {
+            var html = $('#edit-' + id).html();
+            $('#editTd-' + id).html('<form id="form-' + id + '" onsubmit="update(' + id + ');return false;"><input type="hidden" name="id" value="' + id + '"> <div><div class="controls col-md-9" style="position: relative"><input class="form-control datetimepicker" name="date" value="' + html + '"></div><div class="col-md-3"><input class="btn btn-success" type="submit" value="save"></div></div></form>');
+            $('.datetimepicker').datetimepicker({
+                format: 'DD-MM-YYYY HH:mm',
+                locale: 'ru',
+                defaultDate: new Date()
+            });
+        }
+    }
+    function update(id) {
+        var form = $("#form-" + id);
+        var data = form.serializeArray().reduce(function (obj, item) {
+            obj[item.name] = item.value;
+            return obj;
+        }, {});
 
+        $("#editTd-" + id).html('<div id="edit-' + id + '" onclick="edit(' + id + ')">' + data.date + '</div>');
+        console.log(form.serialize());
+    }
+</script>
 
 {% set script %}
     $('#datetimepicker').datetimepicker({
-    format: 'YYYY-MM-DD HH:mm:ss',
-    locale: 'ru'
+    format: 'DD-MM-YYYY HH:mm',
+    locale: 'ru',
+    defaultDate:new Date()
     });
 {% endset %}
 

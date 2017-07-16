@@ -8,6 +8,7 @@
 namespace app\commands;
 
 use app\models\CheckTable;
+use app\models\Followers;
 use app\models\Followings;
 use app\models\helpers\CheckpointException;
 use app\models\Users;
@@ -35,7 +36,7 @@ class ParseController extends Controller
                 
                 $instaApi = new Instagram(true, true, [
                     'storage' => 'mysql',
-                    'dbhost' => 'localhost',
+                    'dbhost' => '103.250.22.104',
                     'dbname' => 'insta',
                     'dbusername' => 'insta',
                     'dbpassword' => 'mPF4F6n6lAyor3KZ',
@@ -63,7 +64,8 @@ class ParseController extends Controller
                             $instaApi->login(true);
                             $user->status = 1;
                             $user->update();
-                            $this->parse($instaApi);
+                            $this->parseFollowings($instaApi);
+                            $this->parseFollowers($instaApi);
                         } catch (\Exception $error) {
                             throw new CheckpointException($user, $error->getMessage());
                         }
@@ -77,7 +79,7 @@ class ParseController extends Controller
      * @param $instaApi \InstagramAPI\Instagram
      * @param $page
      */
-    protected function parse($instaApi, $page = null)
+    protected function parseFollowings($instaApi, $page = null)
     {
         $result = $instaApi->getSelfUsersFollowing($page);
         
@@ -99,7 +101,37 @@ class ParseController extends Controller
             }
         }
         if (!empty($result->next_max_id)) {
-            $this->parse($instaApi, $result->next_max_id);
+            $this->parseFollowings($instaApi, $result->next_max_id);
+        }
+    }
+    
+    /**
+     * @param $instaApi \InstagramAPI\Instagram
+     * @param $page
+     */
+    protected function parseFollowers($instaApi, $page = null)
+    {
+        $result = $instaApi->getSelfUserFollowers($page);
+        
+        print_r($result->users);
+        foreach ($result->users as $user) {
+            $model = new Followers();
+            $model->token = $this->id . '_' . $user->pk;
+            $model->userId = $this->id;
+            $model->followId = $user->pk;
+            $model->profile_pic_url = $user->profile_pic_url;
+            $model->username = $user->username;
+            $model->full_name = $user->full_name;
+            try {
+                $model->save();
+            } catch (\Exception $e) {
+                print_r($e->getMessage());
+                $model->isNewRecord = false;
+                $model->save();
+            }
+        }
+        if (!empty($result->next_max_id)) {
+            $this->parseFollowers($instaApi, $result->next_max_id);
         }
     }
 }

@@ -4,15 +4,13 @@ namespace app\controllers;
 
 use app\models\CheckTable;
 use app\models\Followings;
-use app\models\helpers\CheckpointException;
 use app\models\Scheduler;
 use app\models\Settings;
 use app\models\Status;
 use app\models\Task;
 use app\models\Users;
-use InstagramAPI\Instagram;
+use GuzzleHttp\Client;
 use Yii;
-use yii\base\Exception;
 use yii\web\Controller;
 use yii\web\Response;
 
@@ -38,6 +36,20 @@ class AdminController extends Controller
     public function actionIndex()
     {
         $users = Users::find()->all();
+        foreach ($users as $user) {
+            if ($user->task == 1) {
+                $scheduler = Scheduler::find()->where([
+                    'user' => $user->id,
+                    'status' => 0
+                ])->orderBy(['date' => 'desc'])->one();
+                if (count($scheduler) == 1) {
+                    $user->task = Task::findIdentity($scheduler->task);
+                }
+            }
+            if ($user->task == 1) {
+                $user->task = Task::findIdentity($user->task);
+            }
+        }
         return $this->render('index', ['users' => $users, 'status' => Status::getAll()]);
     }
     
@@ -61,7 +73,10 @@ class AdminController extends Controller
     {
         if (Yii::$app->request->isPost) {
             $data = new Scheduler();
-            $data->date = Yii::$app->request->post('date');
+            // echo Yii::$app->request->post('date');
+            $myDateTime = \DateTime::createFromFormat('d-m-Y H:i', Yii::$app->request->post('date'));
+            $newDateString = $myDateTime->format('Y-m-d H:i:s');
+            $data->date = $newDateString;
             $data->task = Yii::$app->request->post('task');
             $data->user = Yii::$app->request->post('user');
             $data->save();
@@ -72,6 +87,7 @@ class AdminController extends Controller
     
     public function actionSettings()
     {
+    
         if (Yii::$app->request->isPost) {
             foreach (Yii::$app->request->post() as $key => $val) {
                 $data = Settings::findOne($key);
@@ -140,18 +156,40 @@ class AdminController extends Controller
     
     public function actionEdit()
     {
+        $error = false;
         $model = Users::findOne(Yii::$app->request->get('id'));
         if (Yii::$app->request->isPost) {
+            $speed = 0;
+            if (!empty(Yii::$app->request->post('proxy'))) {
+                try {
+                    $client = new Client([
+                        'base_uri' => 'https://instagram.com/',
+                        'timeout' => 4,
+                        'proxy' => Yii::$app->request->post('proxy'),
+                    ]);
+                    $one = microtime();
+            
+                    $result = $client->request('get', '/');
+                    var_dump($result->getStatusCode());
+                    $two = microtime();
+                    $speed = round($two - $one);
+                } catch (\Exception $e) {
+                    $error = $e->getMessage();
+                    $speed = '>4000';
+                }
+            }
+            $model->proxySpeed = $speed;
             $model->userName = Yii::$app->request->post('userName');
             $model->proxy = Yii::$app->request->post('proxy');
             $model->password = Yii::$app->request->post('password');
             $model->email = Yii::$app->request->post('email');
             $model->update();
-            
-            return $this->redirect('/admin');
+            if (!$error) {
+                return $this->redirect('/admin');
+            }
         }
-        
-        return $this->render('edit.twig', ['model' => $model]);
+    
+        return $this->render('edit.twig', ['model' => $model, 'error' => $error]);
     }
     
     public function actionAddbot()

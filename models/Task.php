@@ -12,8 +12,10 @@ class Task extends \yii\base\Object
     
     private static $status = [
         '1' => 'No task',
-        '2' => 'Running Follow/Unfollow',
-        '3' => 'Process Follow/Unfollow'
+        '2' => '...Follow/Unfollow',
+        '3' => 'Process Follow/Unfollow',
+        '4' => '...ML no follow',
+        '5' => 'Process ML no follow'
     ];
     
     
