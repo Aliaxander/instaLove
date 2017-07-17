@@ -121,6 +121,19 @@ class AdminController extends Controller
         return @$data->id;
     }
     
+    public function actionAjaxUpdateScheduler()
+    {
+        if (Yii::$app->request->isPost) {
+            $data = Scheduler::find()->where(['id' => Yii::$app->request->post('id')])->one();
+            $myDateTime = \DateTime::createFromFormat('d-m-Y H:i', Yii::$app->request->post('date'));
+            $newDateString = $myDateTime->format('Y-m-d H:i:s');
+            $data->date = $newDateString;
+            $data->update();
+        }
+        
+        return @$data->id;
+    }
+    
     public function actionSettings()
     {
     

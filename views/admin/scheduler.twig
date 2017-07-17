@@ -13,9 +13,9 @@
             <td id="editTd-{{ scheduler.id }}">
                 {% if scheduler.status==0 %}
                     <div id="edit-{{ scheduler.id }}"
-                         onclick="edit({{ scheduler.id }})">{{ scheduler.date|date("m-d-Y h:i") }}</div>
+                         onclick="edit({{ scheduler.id }})">{{ scheduler.date|date("d-m-Y h:i") }}</div>
                 {% else %}
-                    {{ scheduler.date|date("m-d-Y h:i") }}
+                    {{ scheduler.date|date("d-m-Y h:i") }}
                 {% endif %}
             </td>
             <td>
@@ -94,7 +94,14 @@
             obj[item.name] = item.value;
             return obj;
         }, {});
-
+        $.ajax({
+            type: "POST",
+            url: "/admin/ajax-update-scheduler",
+            data: form.serialize(),
+            success: function (result) {
+                console.log(result);
+            }
+        });
         $("#editTd-" + id).html('<div id="edit-' + id + '" onclick="edit(' + id + ')">' + data.date + '</div>');
         console.log(form.serialize());
     }
