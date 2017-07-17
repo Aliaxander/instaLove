@@ -4,6 +4,7 @@ namespace app\controllers;
 
 use app\models\CheckTable;
 use app\models\Followings;
+use app\models\ForLikes;
 use app\models\Scheduler;
 use app\models\Settings;
 use app\models\Status;
@@ -37,6 +38,29 @@ class AdminController extends Controller
     {
         $users = Users::find()->all();
         foreach ($users as $user) {
+            $progress = '';
+            //Статистика процесса лайкинга:
+            if ($user->task === 5) {
+                $progress1 = count(ForLikes::find()->where('userId=:user',
+                    [':user' => $user->id])->all());
+                $progress2 = count(ForLikes::find()->where('userId=:user and status=1',
+                    [':user' => $user->id])->all());
+            }
+            //статистика процесса фолловинга
+            if ($user->task === 3) {
+                $progress1 = count(Followings::find()->where('userId=:user and status=1',
+                    [':user' => $user->id])->all());
+                $progress2 = count(Followings::find()->where('userId=:user and status=1 and isComplete=1',
+                    [':user' => $user->id])->all());
+            }
+            if (isset($progress1)) {
+                $procent = $progress1 / 100;
+                if ($procent != 0) {
+                    $progress = round($progress2 / $procent);
+                    $progress .= "%";
+                }
+            }
+            $progressAll[$user->id]= $progress;
             if ($user->task == 1) {
                 $scheduler = Scheduler::find()->where([
                     'user' => $user->id,
@@ -46,11 +70,13 @@ class AdminController extends Controller
                     $user->task = Task::findIdentity($scheduler->task);
                 }
             }
-            if ($user->task == 1) {
+            if (is_int($user->task)) {
                 $user->task = Task::findIdentity($user->task);
             }
+    
         }
-        return $this->render('index', ['users' => $users, 'status' => Status::getAll()]);
+    
+        return $this->render('index', ['users' => $users, 'status' => Status::getAll(), 'progress' => $progressAll]);
     }
     
     public function actionScheduler($id)

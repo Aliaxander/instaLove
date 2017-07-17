@@ -13,7 +13,6 @@
 	</thead>
 	<tbody>
     <?php
-    use app\models\Followings;
     use app\models\Status;
 
     if (!empty($users)) {
@@ -29,18 +28,7 @@
                     <?= $user->task ?>
 				</td>
 				<td>
-                    <?php
-                    $progress1 = count(Followings::find()->where('userId=:user and status=1',
-                        [':user' => $user->id])->all());
-                    $progress2 = count(Followings::find()->where('userId=:user and status=1 and isComplete=1',
-                        [':user' => $user->id])->all());
-                    $procent = $progress1 / 100;
-                    if ($procent != 0) {
-                        $progress = round($progress2 / $procent);
-                        echo $progress . "%";
-                    }
-                    
-                    ?>
+                    <?= $progress[$user->id] ?>
 				</td>
 				<td style="width: 240px;">
                     <?php

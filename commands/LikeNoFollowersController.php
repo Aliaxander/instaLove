@@ -16,7 +16,7 @@ use InstagramAPI\Instagram;
 use yii\console\Controller;
 
 /**
- * Class ParseController
+ * Class LikeNoFollowersController
  *
  * @package app\commands
  */
@@ -112,9 +112,12 @@ class LikeNoFollowersController extends Controller
                 foreach ($likesData as $like) {
                     $instaApi->like($like->mediaId);
                     $like->status = 1;
-                    $like->update();
                 }
             }
+            ForLikes::deleteAll(['status' => 1, 'userId' => $accountId]);
+    
+            $user->task = 1;
+            $user->update();
         }
     }
 }
