@@ -3,6 +3,7 @@
 namespace app\controllers;
 
 use app\models\CheckTable;
+use app\models\Followers;
 use app\models\Followings;
 use app\models\ForLikes;
 use app\models\Scheduler;
@@ -41,7 +42,7 @@ class AdminController extends Controller
             $progress = '';
             //Статистика процесса лайкинга:
             if ($user->task === 5) {
-                $progress1 = count(ForLikes::find()->where('userId=:user',
+                $progress1 = count(ForLikes::find()->where('userId=:user and (status=1 or status=0)',
                     [':user' => $user->id])->all());
                 $progress2 = count(ForLikes::find()->where('userId=:user and status=1',
                     [':user' => $user->id])->all());
@@ -60,7 +61,11 @@ class AdminController extends Controller
                     $progress .= "%";
                 }
             }
-            $progressAll[$user->id]= $progress;
+            $progressAll[$user->id] = $progress;
+    
+            $followers = Followers::find()->where(['userId' => $user->id])->count("*");
+            $followersAll[$user->id] = $followers;
+            
             if ($user->task == 1) {
                 $scheduler = Scheduler::find()->where([
                     'user' => $user->id,
@@ -76,7 +81,12 @@ class AdminController extends Controller
     
         }
     
-        return $this->render('index', ['users' => $users, 'status' => Status::getAll(), 'progress' => $progressAll]);
+        return $this->render('index', [
+            'users' => $users,
+            'status' => Status::getAll(),
+            'progress' => $progressAll,
+            'followers' => $followersAll
+        ]);
     }
     
     public function actionScheduler($id)

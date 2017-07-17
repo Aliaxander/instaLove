@@ -114,7 +114,7 @@ class LikeNoFollowersController extends Controller
                     $like->status = 1;
                 }
             }
-            ForLikes::deleteAll(['status' => 1, 'userId' => $accountId]);
+            ForLikes::updateAll(['status' => 2], ['status' => 1, 'userId' => $accountId]);
     
             $user->task = 1;
             $user->update();
