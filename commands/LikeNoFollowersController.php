@@ -141,13 +141,8 @@ class LikeNoFollowersController extends Controller
             }
     
             ForLikes::updateAll(['status' => 2], ['status' => 1, 'userId' => $accountId]);
-    
-            $user->task = 1;
-            $user->countLikes = $user->maxLikes - $totalLikes;
-            $user->update();
-    
             $calendar = Scheduler::find()->where([
-                'user' => $this->user->id,
+                'user' => $user->id,
                 'task' => 4,
                 'status' => 1
             ])->orderBy(['date' => 'desc'])->one();
@@ -155,6 +150,9 @@ class LikeNoFollowersController extends Controller
                 $calendar->status = 3;
                 $calendar->update();
             }
+            $user->task = 1;
+            $user->countLikes = $user->maxLikes - $totalLikes;
+            $user->update();
         }
     }
 }

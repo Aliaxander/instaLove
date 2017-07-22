@@ -15,7 +15,9 @@ class Task extends \yii\base\Object
         '2' => '...Follow/Unfollow',
         '3' => 'Process Follow/Unfollow',
         '4' => '...ML no follow',
-        '5' => 'Process ML no follow'
+        '5' => 'Process ML no follow',
+        '6' => '...ML last photo followers',
+        '7' => 'Process ML last photo followers'
     ];
     
     

@@ -76,11 +76,10 @@ class StartController extends Controller
                 $this->followUnfollow($instaApi, $row->followId, 1);
                 sleep(random_int($settings[1], $settings[2]));
             }
-            $user->task = 1;
-            $user->update();
+           
             Followings::updateAll(['isComplete' => 0], ['userId' => $user->id]);
             $calendar = Scheduler::find()->where([
-                'user' => $this->user->id,
+                'user' => $user->id,
                 'task' => 2,
                 'status' => 1
             ])->orderBy(['date' => 'desc'])->one();
@@ -88,7 +87,8 @@ class StartController extends Controller
                 $calendar->status = 3;
                 $calendar->update();
             }
-    
+            $user->task = 1;
+            $user->update();
         }
     }
     
