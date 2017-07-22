@@ -40,6 +40,7 @@ class LikeLastFollowersController extends Controller
             $user->task = 7;
             $user->update();
             $totalLikes = $user->maxLikes - $user->countLikes;
+            echo "Set max likes:" . $totalLikes;
             $accountId = $user->id;
             $instaApi = new Instagram(true, true, [
                 'storage' => 'mysql',
@@ -115,21 +116,24 @@ class LikeLastFollowersController extends Controller
             $likesData = ForLikes::find()->where(['status' => 0, 'userId' => $accountId])->all();
             if (count($likesData) > 0) {
                 foreach ($likesData as $like) {
-                    if ($totalLikes <= 0) {
+                    if ($totalLikes >= 0) {
                         sleep(random_int($settings[1], $settings[2]));
                         print_r($instaApi->like($like->mediaId));
                         $like->status = 1;
                         $totalLikes--;
                     } else {
+                        echo "\n Max likes for day :( break.";
                         break;
                     }
                 }
+            } else {
+                echo "\n No tasks. break";
             }
             
             ForLikes::updateAll(['status' => 2], ['status' => 1, 'userId' => $accountId]);
             
             $calendar = Scheduler::find()->where([
-                'user' => $user->id,
+                'user' => $accountId,
                 'task' => 6,
                 'status' => 1
             ])->orderBy(['date' => 'desc'])->one();

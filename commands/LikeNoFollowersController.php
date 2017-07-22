@@ -142,7 +142,7 @@ class LikeNoFollowersController extends Controller
     
             ForLikes::updateAll(['status' => 2], ['status' => 1, 'userId' => $accountId]);
             $calendar = Scheduler::find()->where([
-                'user' => $user->id,
+                'user' => $accountId,
                 'task' => 4,
                 'status' => 1
             ])->orderBy(['date' => 'desc'])->one();
