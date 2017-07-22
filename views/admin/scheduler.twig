@@ -26,7 +26,11 @@
             <td>
                 {% if scheduler.status==0 %}
                     Scheduled
-                {% else %}
+                {% elseif scheduler.status==1 %}
+                    Running
+                {% elseif scheduler.status==2 %}
+                    ERROR
+                {% elseif scheduler.status==3 %}
                     Completed
                 {% endif %}
             </td>

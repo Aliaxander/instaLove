@@ -79,6 +79,16 @@ class StartController extends Controller
             $user->task = 1;
             $user->update();
             Followings::updateAll(['isComplete' => 0], ['userId' => $user->id]);
+            $calendar = Scheduler::find()->where([
+                'user' => $this->user->id,
+                'task' => 2,
+                'status' => 1
+            ])->orderBy(['date' => 'desc'])->one();
+            if ($calendar->status !== 2) {
+                $calendar->status = 3;
+                $calendar->update();
+            }
+    
         }
     }
     
@@ -105,7 +115,7 @@ class StartController extends Controller
                     throw new CheckpointException($this->user, $error->getMessage());
                 }
             }
-            
+    
             $this->countError++;
             if ($this->countError <= 5) {
                 sleep(60);
@@ -118,17 +128,17 @@ class StartController extends Controller
                     ->setSubject('Insta ERROR')
                     ->setTextBody('Connection error | ' . $this->user->userName . ' | ' . $message)
                     ->send();
-                
-                
+    
+                $calendar = Scheduler::find()->where([
+                    'user' => $this->user->id,
+                    'task' => 2,
+                    'status' => 1
+                ])->orderBy(['date' => 'desc'])->one();
+                $calendar->status = 2;
+                $calendar->update();
+    
                 throw new CheckpointException($this->user, $message);
             }
-            $calendar = Scheduler::find()->where([
-                'user' => $this->user->id,
-                'task' => 2,
-                'status' => 1
-            ])->orderBy(['date' => 'desc'])->one();
-            $calendar->status = 2;
-            $calendar->update();
         }
     }
 }

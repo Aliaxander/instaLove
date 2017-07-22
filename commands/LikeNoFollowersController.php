@@ -145,6 +145,16 @@ class LikeNoFollowersController extends Controller
             $user->task = 1;
             $user->countLikes = $user->maxLikes - $totalLikes;
             $user->update();
+    
+            $calendar = Scheduler::find()->where([
+                'user' => $this->user->id,
+                'task' => 4,
+                'status' => 1
+            ])->orderBy(['date' => 'desc'])->one();
+            if ($calendar->status !== 2) {
+                $calendar->status = 3;
+                $calendar->update();
+            }
         }
     }
 }
