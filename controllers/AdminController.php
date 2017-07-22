@@ -63,8 +63,10 @@ class AdminController extends Controller
                     $progress .= "%";
                 }
             }
-            $progressAll[$user->id] = $progress . " ($progress2/$progress1)";
-    
+            $progressAll[$user->id] = $progress;
+            if (!empty($progress)) {
+                $progressAll[$user->id] .= " ($progress2/$progress1)";
+            }
             $followers = Followers::find()->where(['userId' => $user->id])->count("*");
             $followersAll[$user->id] = $followers;
             
@@ -80,7 +82,6 @@ class AdminController extends Controller
             if (is_int($user->task)) {
                 $user->task = Task::findIdentity($user->task);
             }
-    
         }
     
         return $this->render('index', [
