@@ -9,6 +9,7 @@ namespace app\commands;
 
 use app\models\Followings;
 use app\models\helpers\CheckpointException;
+use app\models\Scheduler;
 use app\models\Settings;
 use app\models\Users;
 use InstagramAPI\Instagram;
@@ -121,6 +122,13 @@ class StartController extends Controller
                 
                 throw new CheckpointException($this->user, $message);
             }
+            $calendar = Scheduler::find()->where([
+                'user' => $this->user->id,
+                'task' => 2,
+                'status' => 1
+            ])->orderBy(['date' => 'desc'])->one();
+            $calendar->status = 2;
+            $calendar->update();
         }
     }
 }

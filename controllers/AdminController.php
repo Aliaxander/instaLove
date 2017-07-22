@@ -234,6 +234,8 @@ class AdminController extends Controller
             $model->email = Yii::$app->request->post('email');
             $model->timeoutMin = Yii::$app->request->post('timeoutMin');
             $model->timeoutMax = Yii::$app->request->post('timeoutMax');
+            $model->maxLikes = Yii::$app->request->post('maxLikes');
+            
             $model->update();
             if (!$error) {
                 return $this->redirect('/admin');

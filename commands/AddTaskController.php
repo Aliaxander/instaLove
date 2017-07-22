@@ -7,12 +7,8 @@
 
 namespace app\commands;
 
-use app\models\Followings;
-use app\models\helpers\CheckpointException;
 use app\models\Scheduler;
-use app\models\Settings;
 use app\models\Users;
-use InstagramAPI\Instagram;
 use yii\console\Controller;
 
 /**
@@ -33,6 +29,11 @@ class AddTaskController extends Controller
                 print_r($task);
                 $model = Users::findOne($task->user);
                 $model->task = $task->task;
+                if ($model->day != date('Y-m-d')) {
+                    $model->countLikes = 0;
+                }
+                $model->day = date('Y-m-d');
+                
                 $model->update();
             }
         }

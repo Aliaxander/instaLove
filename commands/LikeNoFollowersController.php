@@ -10,6 +10,7 @@ namespace app\commands;
 use app\models\Followings;
 use app\models\ForLikes;
 use app\models\helpers\CheckpointException;
+use app\models\Scheduler;
 use app\models\Settings;
 use app\models\Users;
 use InstagramAPI\Instagram;
@@ -40,6 +41,7 @@ class LikeNoFollowersController extends Controller
         if (count($user) === 1) {
             $user->task = 5;
             $user->update();
+            $totalLikes = $user->maxLikes - $user->countLikes;
             $accountId = $user->id;
             $instaApi = new Instagram(true, true, [
                 'storage' => 'mysql',
@@ -86,22 +88,32 @@ class LikeNoFollowersController extends Controller
                             if (count($findFollowers) === 0) {
                                 $countMedia = 0;
                                 echo "\nset user" . $userId;
-                                $photos = $instaApi->getUserFeed($userId);
-                                foreach ($photos->items as $item) {
-                                    //print_r($item);
-                                    $token = $accountId . "_" . $item->pk;
-                                    $findMedia = ForLikes::find()->where(['token' => $token])->one();
-                                    if (count($findMedia) === 0) {
-                                        $countMedia++;
-                                        $forLike = new ForLikes();
-                                        $forLike->userId = $accountId;
-                                        $forLike->token = $token;
-                                        $forLike->mediaId = $item->pk;
-                                        $forLike->save();
+                                try {
+                                    $photos = $instaApi->getUserFeed($userId);
+                                    foreach ($photos->items as $item) {
+                                        //print_r($item);
+                                        $token = $accountId . "_" . $item->pk;
+                                        $findMedia = ForLikes::find()->where(['token' => $token])->one();
+                                        if (count($findMedia) === 0) {
+                                            $countMedia++;
+                                            $forLike = new ForLikes();
+                                            $forLike->userId = $accountId;
+                                            $forLike->token = $token;
+                                            $forLike->mediaId = $item->pk;
+                                            $forLike->save();
+                                        }
+                                        if ($countMedia >= 10) {
+                                            break;
+                                        }
                                     }
-                                    if ($countMedia >= 10) {
-                                        break;
-                                    }
+                                } catch (\Exception $error) {
+                                    $calendar = Scheduler::find()->where([
+                                        'user' => $user->id,
+                                        'task' => 4,
+                                        'status' => 1
+                                    ])->orderBy(['date' => 'desc'])->one();
+                                    $calendar->status = 2;
+                                    $calendar->update();
                                 }
                             }
                         }
@@ -112,17 +124,26 @@ class LikeNoFollowersController extends Controller
                     }
                 }
             }
+    
+    
             $likesData = ForLikes::find()->where(['status' => 0, 'userId' => $accountId])->all();
             if (count($likesData) > 0) {
                 foreach ($likesData as $like) {
-                    sleep(random_int($settings[1], $settings[2]));
-                    $instaApi->like($like->mediaId);
-                    $like->status = 1;
+                    if ($totalLikes <= 0) {
+                        sleep(random_int($settings[1], $settings[2]));
+                        $instaApi->like($like->mediaId);
+                        $like->status = 1;
+                        $totalLikes--;
+                    } else {
+                        break;
+                    }
                 }
             }
+    
             ForLikes::updateAll(['status' => 2], ['status' => 1, 'userId' => $accountId]);
     
             $user->task = 1;
+            $user->countLikes = $user->maxLikes - $totalLikes;
             $user->update();
         }
     }
