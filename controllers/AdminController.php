@@ -232,6 +232,8 @@ class AdminController extends Controller
             $model->proxy = Yii::$app->request->post('proxy');
             $model->password = Yii::$app->request->post('password');
             $model->email = Yii::$app->request->post('email');
+            $model->timeoutMin = Yii::$app->request->post('timeoutMin');
+            $model->timeoutMax = Yii::$app->request->post('timeoutMax');
             $model->update();
             if (!$error) {
                 return $this->redirect('/admin');

@@ -21,7 +21,7 @@
 			<tr>
 				<td><?= $user->id ?></td>
 				<td><?= $user->email ?></td>
-				<td><?= $user->userName ?> (<?= $followers[$user->id] ?>)</td>
+				<td><a href="https://instagram.com/<?= $user->userName ?>" target="_blank"><?= $user->userName ?></a> (<?= $followers[$user->id] ?>)</td>
 				<td><?= $user->proxy ?></td>
 				<td><?= Status::findIdentity($user->status) ?></td>
 				<td style="width: 220px;">

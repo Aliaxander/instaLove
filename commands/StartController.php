@@ -31,8 +31,13 @@ class StartController extends Controller
         foreach ($settingsTmp as $row) {
             $settings[$row->id] = $row->value;
         }
+    
         $user = Users::find()->where(['task' => 2])->one();
         $this->user = $user;
+        if (!empty($user->timeoutMin)) {
+            $settings[1] = $user->timeoutMin;
+            $settings[2] = $user->timeoutMax;
+        }
         if (count($user) === 1) {
             $user->task = 3;
             $user->update();
