@@ -120,6 +120,7 @@ class LikeLastFollowersController extends Controller
                         sleep(random_int($settings[1], $settings[2]));
                         print_r($instaApi->like($like->mediaId));
                         $like->status = 1;
+                        $like->update();
                         $totalLikes--;
                     } else {
                         echo "\n Max likes for day :( break.";
