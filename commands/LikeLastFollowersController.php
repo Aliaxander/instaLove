@@ -138,9 +138,11 @@ class LikeLastFollowersController extends Controller
                 'task' => 6,
                 'status' => 1
             ])->orderBy(['date' => 'desc'])->one();
-            if ($calendar->status !== 2) {
-                $calendar->status = 3;
-                $calendar->update();
+            if (count($calendar) === 1) {
+                if ($calendar->status !== 2) {
+                    $calendar->status = 3;
+                    $calendar->update();
+                }
             }
             $user->task = 1;
             $user->countLikes = $user->maxLikes - $totalLikes;
