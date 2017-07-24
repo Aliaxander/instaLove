@@ -37,7 +37,6 @@ class StartController extends Controller
             $user->task = 3;
             $user->update();
             
-            
             //InstagramLogic:
             $instaApi = new Instagram(false, false, [
                 'storage' => 'mysql',
@@ -91,7 +90,7 @@ class StartController extends Controller
             }
         } catch (\Exception $error) {
             echo $error->getMessage();
-            print_r($error);
+          //  print_r($error);
             if ($error->getMessage() === 'InstagramAPI\Response\FollowerAndFollowingResponse: login_required.') {
                 try {
                     $instaApi->login(true);
@@ -112,7 +111,6 @@ class StartController extends Controller
                     ->setSubject('Insta ERROR')
                     ->setTextBody('Connection error | ' . $this->user->userName . ' | ' . $message)
                     ->send();
-                
                 
                 throw new CheckpointException($this->user, $message);
             }
