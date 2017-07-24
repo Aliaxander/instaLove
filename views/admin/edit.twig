@@ -24,6 +24,25 @@
                 <div class="col-md-1">{{ proxySpeed }}ms</div>
             </div>
             <div class="row">
+                <div class="col-md-3">TimeOut min</div>
+                <div class="col-md-6"><input class="form-control" name="timeoutMin" type="text"
+                                             value="{{ model.timeoutMin }}">
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-3">TimeOut max</div>
+                <div class="col-md-6"><input class="form-control" name="timeoutMax" type="text"
+                                             value="{{ model.timeoutMax }}">
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-3">Max Likes for day</div>
+                <div class="col-md-6"><input class="form-control" name="maxLikes" type="text"
+                                             value="{{ model.maxLikes }}">
+                </div>
+            </div>
+
+            <div class="row">
                 <div class="col-md-3"></div>
                 <div class="col-md-6"><input type="submit" class="btn btn-success" value="save"></div>
             </div>

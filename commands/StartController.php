@@ -9,6 +9,7 @@ namespace app\commands;
 
 use app\models\Followings;
 use app\models\helpers\CheckpointException;
+use app\models\Scheduler;
 use app\models\Settings;
 use app\models\Users;
 use InstagramAPI\Instagram;
@@ -31,11 +32,17 @@ class StartController extends Controller
         foreach ($settingsTmp as $row) {
             $settings[$row->id] = $row->value;
         }
+    
         $user = Users::find()->where(['task' => 2])->one();
         $this->user = $user;
+        if (!empty($user->timeoutMin)) {
+            $settings[1] = $user->timeoutMin;
+            $settings[2] = $user->timeoutMax;
+        }
         if (count($user) === 1) {
             $user->task = 3;
             $user->update();
+            
             
             //InstagramLogic:
             $instaApi = new Instagram(false, false, [
@@ -69,9 +76,19 @@ class StartController extends Controller
                 $this->followUnfollow($instaApi, $row->followId, 1);
                 sleep(random_int($settings[1], $settings[2]));
             }
+           
+            Followings::updateAll(['isComplete' => 0], ['userId' => $user->id]);
+            $calendar = Scheduler::find()->where([
+                'user' => $user->id,
+                'task' => 2,
+                'status' => 1
+            ])->orderBy(['date' => 'desc'])->one();
+            if ($calendar->status !== 2) {
+                $calendar->status = 3;
+                $calendar->update();
+            }
             $user->task = 1;
             $user->update();
-            Followings::updateAll(['isComplete' => 0], ['userId' => $user->id]);
         }
     }
     
@@ -90,7 +107,7 @@ class StartController extends Controller
             }
         } catch (\Exception $error) {
             echo $error->getMessage();
-          //  print_r($error);
+            print_r($error);
             if ($error->getMessage() === 'InstagramAPI\Response\FollowerAndFollowingResponse: login_required.') {
                 try {
                     $instaApi->login(true);
@@ -98,7 +115,7 @@ class StartController extends Controller
                     throw new CheckpointException($this->user, $error->getMessage());
                 }
             }
-            
+    
             $this->countError++;
             if ($this->countError <= 5) {
                 sleep(60);
@@ -111,7 +128,15 @@ class StartController extends Controller
                     ->setSubject('Insta ERROR')
                     ->setTextBody('Connection error | ' . $this->user->userName . ' | ' . $message)
                     ->send();
-                
+    
+                $calendar = Scheduler::find()->where([
+                    'user' => $this->user->id,
+                    'task' => 2,
+                    'status' => 1
+                ])->orderBy(['date' => 'desc'])->one();
+                $calendar->status = 2;
+                $calendar->update();
+    
                 throw new CheckpointException($this->user, $message);
             }
         }

@@ -40,8 +40,10 @@ class AdminController extends Controller
         $users = Users::find()->all();
         foreach ($users as $user) {
             $progress = '';
+            $progress1 = 0;
+            $progress2 = 0;
             //Статистика процесса лайкинга:
-            if ($user->task === 5) {
+            if ($user->task === 5 || $user->task === 7) {
                 $progress1 = count(ForLikes::find()->where('userId=:user and (status=1 or status=0)',
                     [':user' => $user->id])->all());
                 $progress2 = count(ForLikes::find()->where('userId=:user and status=1',
@@ -62,7 +64,9 @@ class AdminController extends Controller
                 }
             }
             $progressAll[$user->id] = $progress;
-    
+            if (!empty($progress)) {
+                $progressAll[$user->id] .= " ($progress2/$progress1)";
+            }
             $followers = Followers::find()->where(['userId' => $user->id])->count("*");
             $followersAll[$user->id] = $followers;
             
@@ -78,7 +82,6 @@ class AdminController extends Controller
             if (is_int($user->task)) {
                 $user->task = Task::findIdentity($user->task);
             }
-    
         }
     
         return $this->render('index', [
@@ -232,6 +235,10 @@ class AdminController extends Controller
             $model->proxy = Yii::$app->request->post('proxy');
             $model->password = Yii::$app->request->post('password');
             $model->email = Yii::$app->request->post('email');
+            $model->timeoutMin = Yii::$app->request->post('timeoutMin');
+            $model->timeoutMax = Yii::$app->request->post('timeoutMax');
+            $model->maxLikes = Yii::$app->request->post('maxLikes');
+            
             $model->update();
             if (!$error) {
                 return $this->redirect('/admin');

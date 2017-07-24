@@ -21,12 +21,20 @@
             <td>
                 {% if scheduler.task==2 %}
                     Follow/Unfollow
+                {% elseif scheduler.task==4 %}
+                    ML no follow
+                {% elseif scheduler.task==6 %}
+                    ML last 5 photo followers
                 {% endif %}
             </td>
             <td>
                 {% if scheduler.status==0 %}
                     Scheduled
-                {% else %}
+                {% elseif scheduler.status==1 %}
+                    Running
+                {% elseif scheduler.status==2 %}
+                    ERROR
+                {% elseif scheduler.status==3 %}
                     Completed
                 {% endif %}
             </td>
@@ -41,8 +49,9 @@
 <hr>
 <div class="row">
     <div class="col-md-3"><select class="form-control" name="task">
-            <option value="2">Follow</option>
+            <option value="2">Follow/Unfollow</option>
             <option value="4">ML no follow</option>
+            <option value="6">ML last 5 photo followers</option>
         </select></div>
 </div>
 <div class="row">
