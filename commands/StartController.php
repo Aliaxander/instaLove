@@ -105,7 +105,9 @@ class StartController extends Controller
         try {
             if ($isFollow === 1) {
                 $instaApi->follow($accountId);
+                echo ' - Ok follow';
             } else {
+                echo ' - unfollow ok';
                 $instaApi->unfollow($accountId);
             }
         } catch (\Exception $error) {
