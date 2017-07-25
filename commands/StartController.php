@@ -69,7 +69,7 @@ class StartController extends Controller
             $followings = Followings::find()->where(['userId' => $user->id, 'status' => 1, 'isComplete' => 0])->all();
             foreach ($followings as $row) {
                 $row->isComplete = 1;
-                $row->save();
+                $row->update();
                 echo "\nUnfollow {$row->followId}";
                 $this->followUnfollow($instaApi, $row->followId, 0);
                 sleep(random_int($settings[1], $settings[2]));
