@@ -19,12 +19,14 @@
                 {% endif %}
             </td>
             <td>
-                {% if scheduler.task==2 %}
+                {% if scheduler.task=='2' %}
                     Follow/Unfollow
-                {% elseif scheduler.task==4 %}
+                {% elseif scheduler.task=='4' %}
                     ML no follow
-                {% elseif scheduler.task==6 %}
+                {% elseif scheduler.task=='6' %}
                     ML last 5 photo followers
+                {% elseif scheduler.task=='8' %}
+                    ML last 5 photo Selected account followers @{{ scheduler.account }}
                 {% endif %}
             </td>
             <td>
@@ -48,15 +50,22 @@
 </table>
 <hr>
 <div class="row">
-    <div class="col-md-3"><select class="form-control" name="task">
+    <div class="col-md-3">
+        <select class="form-control" name="task" id="task">
             <option value="2">Follow/Unfollow</option>
             <option value="4">ML no follow</option>
             <option value="6">ML last 5 photo followers</option>
+            <option value="8">ML last 5 photo Selected account followers</option>
         </select></div>
 </div>
 <div class="row">
     <div class="col-md-3">
         <input class="form-control" name="date" id="datetimepicker">
+    </div>
+</div>
+<div class="row" id="accountForm" style="display: none">
+    <div class="col-md-3">
+        <input class="form-control" name="account" id="account" placeholder="Username">
     </div>
 </div>
 <div class="row">
@@ -68,11 +77,13 @@
     function add() {
         var date = $('input[name="date"]').val();
         var task = $('select[name="task"]').val();
+        var account = $('input[name="account"]').val();
+
         $("#submit").val('Loading...').prop("disabled", true);
         $.ajax({
             type: "POST",
             url: "/admin/ajax-add-scheduler",
-            data: "date=" + date + "&task=" + task + "&user={{ id }}",
+            data: "date=" + date + "&task=" + task + "&user={{ id }}" + "&account=" + account,
             success: function (result) {
                 console.log(result);
                 if (result > 0) {
@@ -114,6 +125,8 @@
         $("#editTd-" + id).html('<div id="edit-' + id + '" onclick="edit(' + id + ')">' + data.date + '</div>');
         console.log(form.serialize());
     }
+
+
 </script>
 
 {% set script %}
@@ -121,6 +134,16 @@
     format: 'DD-MM-YYYY HH:mm',
     locale: 'ru',
     defaultDate:new Date()
+    });
+
+    $("#task").change(function () {
+    if ($("#task").val() == '8') {
+    $('#account').val('');
+    $('#accountForm').show();
+    } else {
+    $('#account').val('');
+    $('#accountForm').hide();
+    }
     });
 {% endset %}
 

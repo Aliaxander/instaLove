@@ -43,7 +43,7 @@ class AdminController extends Controller
             $progress1 = 0;
             $progress2 = 0;
             //Статистика процесса лайкинга:
-            if ($user->task === 5 || $user->task === 7) {
+            if ($user->task === 5 || $user->task === 7 || $user->task === 9) {
                 $progress1 = count(ForLikes::find()->where('userId=:user and (status=1 or status=0)',
                     [':user' => $user->id])->all());
                 $progress2 = count(ForLikes::find()->where('userId=:user and status=1',
@@ -118,6 +118,7 @@ class AdminController extends Controller
             $data->date = $newDateString;
             $data->task = Yii::$app->request->post('task');
             $data->user = Yii::$app->request->post('user');
+            $data->account = Yii::$app->request->post('account');
             $data->save();
         }
         
