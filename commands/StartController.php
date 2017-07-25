@@ -47,7 +47,7 @@ class StartController extends Controller
             //InstagramLogic:
             $instaApi = new Instagram(false, false, [
                 'storage' => 'mysql',
-                'dbhost' => 'localhost',
+                'dbhost' => '103.250.22.104',
                 'dbname' => 'insta',
                 'dbusername' => 'insta',
                 'dbpassword' => 'mPF4F6n6lAyor3KZ',
