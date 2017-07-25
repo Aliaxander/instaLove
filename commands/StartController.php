@@ -121,7 +121,9 @@ class StartController extends Controller
                 echo "\nSleep for error";
                 sleep(60);
                 $this->followUnfollow($instaApi, $accountId, $isFollow);
+                $instaApi->follow($accountId);
             } else {
+                $instaApi->follow($accountId);
                 $message = $error->getMessage();
                 \Yii::$app->mailer->compose()
                     ->setFrom('insta@allsoft.com')
