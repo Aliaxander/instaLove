@@ -101,7 +101,7 @@ class StartController extends Controller
     protected function followUnfollow($instaApi, $accountId, $isFollow)
     {
         try {
-            if ($isFollow) {
+            if ($isFollow === 1) {
                 $instaApi->follow($accountId);
             } else {
                 $instaApi->unfollow($accountId);
