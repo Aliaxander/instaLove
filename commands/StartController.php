@@ -45,7 +45,7 @@ class StartController extends Controller
             
             
             //InstagramLogic:
-            $instaApi = new Instagram(false, false, [
+            $instaApi = new Instagram(true, false, [
                 'storage' => 'mysql',
                 'dbhost' => '103.250.22.104',
                 'dbname' => 'insta',
@@ -68,11 +68,12 @@ class StartController extends Controller
             
             $followings = Followings::find()->where(['userId' => $user->id, 'status' => 1, 'isComplete' => 0])->all();
             foreach ($followings as $row) {
-                $follow = Followings::find()->where(['id' => $row->id])->one();
-                $follow->isComplete = 1;
-                $follow->save();
+                $row->isComplete = 1;
+                $row->save();
+                echo "\nUnfollow {$row->followId}";
                 $this->followUnfollow($instaApi, $row->followId, 0);
                 sleep(random_int($settings[1], $settings[2]));
+                echo "\nFollow {$row->followId}";
                 $this->followUnfollow($instaApi, $row->followId, 1);
                 sleep(random_int($settings[1], $settings[2]));
             }
@@ -118,6 +119,7 @@ class StartController extends Controller
     
             $this->countError++;
             if ($this->countError <= 5) {
+                echo "\nSleep for error";
                 sleep(60);
                 $this->followUnfollow($instaApi, $accountId, $isFollow);
             } else {
