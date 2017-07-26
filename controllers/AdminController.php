@@ -50,7 +50,7 @@ class AdminController extends Controller
                     [':user' => $user->id])->all());
             }
             //статистика процесса фолловинга
-            if ($user->task === 3) {
+            if ($user->task === 3 || $user->task === 11) {
                 $progress1 = count(Followings::find()->where('userId=:user and status=1',
                     [':user' => $user->id])->all());
                 $progress2 = count(Followings::find()->where('userId=:user and status=1 and isComplete=1',
@@ -83,7 +83,7 @@ class AdminController extends Controller
                 $user->task = Task::findIdentity($user->task);
             }
         }
-    
+        
         return $this->render('index', [
             'users' => $users,
             'status' => Status::getAll(),
@@ -140,7 +140,7 @@ class AdminController extends Controller
     
     public function actionSettings()
     {
-    
+        
         if (Yii::$app->request->isPost) {
             foreach (Yii::$app->request->post() as $key => $val) {
                 $data = Settings::findOne($key);
@@ -221,7 +221,7 @@ class AdminController extends Controller
                         'proxy' => Yii::$app->request->post('proxy'),
                     ]);
                     $one = microtime();
-            
+                    
                     $result = $client->request('get', '/');
                     var_dump($result->getStatusCode());
                     $two = microtime();
@@ -245,7 +245,7 @@ class AdminController extends Controller
                 return $this->redirect('/admin');
             }
         }
-    
+        
         return $this->render('edit.twig', ['model' => $model, 'error' => $error]);
     }
     
