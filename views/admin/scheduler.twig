@@ -27,6 +27,8 @@
                     ML last 5 photo followers
                 {% elseif scheduler.task=='8' %}
                     ML last 5 photo Selected account followers @{{ scheduler.account }}
+                {% elseif scheduler.task=='10' %}
+                    Follow old followings
                 {% endif %}
             </td>
             <td>
@@ -56,6 +58,7 @@
             <option value="4">ML no follow</option>
             <option value="6">ML last 5 photo followers</option>
             <option value="8">ML last 5 photo Selected account followers</option>
+            <option value="10">Follow old followings</option>
         </select></div>
 </div>
 <div class="row">
@@ -97,6 +100,7 @@
         });
 
     }
+
     function edit(id) {
         if (id) {
             var html = $('#edit-' + id).html();
@@ -108,6 +112,7 @@
             });
         }
     }
+
     function update(id) {
         var form = $("#form-" + id);
         var data = form.serializeArray().reduce(function (obj, item) {
