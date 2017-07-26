@@ -44,7 +44,7 @@ class LikeLastMediaAccountFollowersController extends Controller
                 'user' => $user->id,
                 'status' => 1
             ])->orderBy(['date' => 'desc'])->one();
-            $searchAccount = file_get_contents('https://www.instagram.com/oxsander/?__a=1');
+            $searchAccount = file_get_contents('https://www.instagram.com/' . $task->account . '/?__a=1');
             $searchAccount = @json_decode($searchAccount);
             if (!empty($searchAccount)) {
                 $followAccountId = $searchAccount->user->id;
