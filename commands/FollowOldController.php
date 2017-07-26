@@ -33,14 +33,14 @@ class FollowOldController extends Controller
             $settings[$row->id] = $row->value;
         }
         
-        $user = Users::find()->where(['task' => 2])->one();
+        $user = Users::find()->where(['task' => 10])->one();
         $this->user = $user;
         if (!empty($user->timeoutMin)) {
             $settings[1] = $user->timeoutMin;
             $settings[2] = $user->timeoutMax;
         }
         if (count($user) === 1) {
-            $user->task = 3;
+            $user->task = 11;
             $user->update();
             
             
