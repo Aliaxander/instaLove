@@ -86,6 +86,7 @@ class LikeLastFollowersController extends Controller
                                     $forLike->userId = $accountId;
                                     $forLike->token = $token;
                                     $forLike->mediaId = $item->pk;
+                                    $forLike->scheduler=$user->scheduler;
                                     $forLike->save();
                                 } else {
                                     echo "\nSkipping mediaId:" . $item->pk;
@@ -99,10 +100,8 @@ class LikeLastFollowersController extends Controller
                             }
                         } catch (\Exception $error) {
                             $calendar = Scheduler::find()->where([
-                                'user' => $user->id,
-                                'task' => 6,
-                                'status' => 1
-                            ])->orderBy(['date' => 'desc'])->one();
+                                'id' => $user->scheduler
+                            ])->one();
                             if (count($calendar) === 1) {
                                 $calendar->status = 2;
                                 $calendar->update();
@@ -132,12 +131,10 @@ class LikeLastFollowersController extends Controller
             }
             
             ForLikes::updateAll(['status' => 2], ['status' => 1, 'userId' => $accountId]);
-            
+    
             $calendar = Scheduler::find()->where([
-                'user' => $accountId,
-                'task' => 6,
-                'status' => 1
-            ])->orderBy(['date' => 'desc'])->one();
+                'id' => $user->scheduler
+            ])->one();
             if (count($calendar) === 1) {
                 if ($calendar->status !== 2) {
                     $calendar->status = 3;

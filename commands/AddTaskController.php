@@ -23,9 +23,6 @@ class AddTaskController extends Controller
         $tasks = Scheduler::find()->where("date<=now() and status=0")->all();
         if (!empty($tasks)) {
             foreach ($tasks as $task) {
-                $task->status = 1;
-                $task->update();
-                
                 print_r($task);
                 $model = Users::findOne($task->user);
                 $model->task = $task->task;
@@ -33,8 +30,11 @@ class AddTaskController extends Controller
                     $model->countLikes = 0;
                 }
                 $model->day = date('Y-m-d');
-                
+                $model->scheduler = $task->id;
                 $model->update();
+    
+                $task->status = 1;
+                $task->update();
             }
         }
     }

@@ -33,11 +33,11 @@
                 {% if scheduler.status==0 %}
                     Scheduled
                 {% elseif scheduler.status==1 %}
-                    Running
+                    {{ scheduler.dateUpdate }} - Running
                 {% elseif scheduler.status==2 %}
-                    ERROR
+                    {{ scheduler.dateUpdate }} - ERROR
                 {% elseif scheduler.status==3 %}
-                    Completed
+                    {{ scheduler.dateUpdate }} - Completed
                 {% endif %}
             </td>
             <td>

@@ -82,10 +82,8 @@ class StartController extends Controller
            
             Followings::updateAll(['isComplete' => 0], ['userId' => $user->id]);
             $calendar = Scheduler::find()->where([
-                'user' => $user->id,
-                'task' => 2,
-                'status' => 1
-            ])->orderBy(['date' => 'desc'])->one();
+                'id' => $user->scheduler
+            ])->one();
             if ($calendar->status !== 2) {
                 $calendar->status = 3;
                 $calendar->update();
@@ -137,10 +135,8 @@ class StartController extends Controller
                     ->send();
     
                 $calendar = Scheduler::find()->where([
-                    'user' => $this->user->id,
-                    'task' => 2,
-                    'status' => 1
-                ])->orderBy(['date' => 'desc'])->one();
+                    'id' => $this->user->scheduler
+                ])->one();
                 $calendar->status = 2;
                 $calendar->update();
     

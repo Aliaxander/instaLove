@@ -100,6 +100,7 @@ class LikeNoFollowersController extends Controller
                                             $forLike->userId = $accountId;
                                             $forLike->token = $token;
                                             $forLike->mediaId = $item->pk;
+                                            $forLike->scheduler = $user->scheduler;
                                             $forLike->save();
                                         }
                                         if ($countMedia >= 10) {
@@ -108,10 +109,8 @@ class LikeNoFollowersController extends Controller
                                     }
                                 } catch (\Exception $error) {
                                     $calendar = Scheduler::find()->where([
-                                        'user' => $user->id,
-                                        'task' => 4,
-                                        'status' => 1
-                                    ])->orderBy(['date' => 'desc'])->one();
+                                        'id' => $user->scheduler
+                                    ])->one();
                                     $calendar->status = 2;
                                     $calendar->update();
                                 }
@@ -143,10 +142,8 @@ class LikeNoFollowersController extends Controller
     
             ForLikes::updateAll(['status' => 2], ['status' => 1, 'userId' => $accountId]);
             $calendar = Scheduler::find()->where([
-                'user' => $accountId,
-                'task' => 4,
-                'status' => 1
-            ])->orderBy(['date' => 'desc'])->one();
+                'id' => $user->scheduler
+            ])->one();
             if ($calendar->status !== 2) {
                 $calendar->status = 3;
                 $calendar->update();
