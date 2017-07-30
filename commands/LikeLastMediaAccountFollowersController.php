@@ -39,7 +39,12 @@ class LikeLastMediaAccountFollowersController extends Controller
         }
         
         if (count($user) === 1) {
-            $searchAccount = file_get_contents('https://www.instagram.com/oxsander/?__a=1');
+            $task = Scheduler::find()->where([
+                'task' => 8,
+                'user' => $user->id,
+                'status' => 1
+            ])->orderBy(['date' => 'desc'])->one();
+            $searchAccount = file_get_contents('https://www.instagram.com/' . $task->account . '/?__a=1');
             $searchAccount = @json_decode($searchAccount);
             if (!empty($searchAccount)) {
                 $followAccountId = $searchAccount->user->id;
@@ -70,53 +75,8 @@ class LikeLastMediaAccountFollowersController extends Controller
                         throw new CheckpointException($user, $error->getMessage());
                     }
                 }
-                $result = $instaApi->getUserFollowers($followAccountId);
-                if (!empty($result->users)) {
-                    $rows = @$result->users;
-                    
-                    foreach ($rows as $row) {
-                        if (!$row->is_private) {
-                            $userId = $row->pk;
-                            $countMedia = 0;
-                            echo "\nset user" . $userId;
-                            try {
-                                $photos = $instaApi->getUserFeed($userId);
-                                foreach ($photos->items as $item) {
-                                    $countMedia++;
-                                    // print_r($item);
-                                    $token = $accountId . "_" . $item->pk;
-                                    $findMedia = ForLikes::find()->where(['token' => $token])->one();
-                                    if (count($findMedia) === 0) {
-                                        echo "\nadd mediaId:" . $item->pk;
-                                        $forLike = new ForLikes();
-                                        $forLike->userId = $accountId;
-                                        $forLike->token = $token;
-                                        $forLike->mediaId = $item->pk;
-                                        $forLike->scheduler = $user->scheduler;
-                                        $forLike->save();
-                                    } else {
-                                        echo "\nSkipping mediaId:" . $item->pk;
-                                        echo "\nLast media for likes. Break";
-                                        break;
-                                    }
-                                    if ($countMedia >= 5) {
-                                        echo "\nMax media (5) for user. Break";
-                                        break;
-                                    }
-                                }
-                            } catch (\Exception $error) {
-                                $calendar = Scheduler::find()->where([
-                                    'id' => $user->scheduler
-                                ])->one();
-                                if (count($calendar) === 1) {
-                                    $calendar->status = 2;
-                                    $calendar->update();
-                                }
-                            }
-                        }
-                    }
-                }
                 
+                $this->getFollowers($instaApi, $user, $followAccountId, $accountId);
                 
                 $likesData = ForLikes::find()->where(['status' => 0, 'userId' => $accountId])->all();
                 if (count($likesData) > 0) {
@@ -137,10 +97,12 @@ class LikeLastMediaAccountFollowersController extends Controller
                 }
                 
                 ForLikes::updateAll(['status' => 2], ['status' => 1, 'userId' => $accountId]);
-    
+                
                 $calendar = Scheduler::find()->where([
-                    'id' => $user->scheduler
-                ])->one();
+                    'user' => $accountId,
+                    'task' => 6,
+                    'status' => 1
+                ])->orderBy(['date' => 'desc'])->one();
                 if (count($calendar) === 1) {
                     if ($calendar->status !== 2) {
                         $calendar->status = 3;
@@ -152,6 +114,65 @@ class LikeLastMediaAccountFollowersController extends Controller
                 $user->countLikes = $user->maxLikes - $totalLikes;
                 $user->update();
             }
+        }
+    }
+    
+    /**
+     * @param $instaApi \InstagramAPI\Instagram
+     * @param $user
+     * @param $followAccountId
+     */
+    protected function getFollowers($instaApi, $user, $followAccountId, $accountId, $nextId = null)
+    {
+        $result = $instaApi->getUserFollowers($followAccountId, $nextId);
+        if (!empty($result->users)) {
+            $rows = @$result->users;
+            
+            foreach ($rows as $row) {
+                if (!$row->is_private) {
+                    $userId = $row->pk;
+                    $countMedia = 0;
+                    echo "\nset user" . $userId;
+                    try {
+                        $photos = $instaApi->getUserFeed($userId);
+                        foreach ($photos->items as $item) {
+                            $countMedia++;
+                            // print_r($item);
+                            $token = $accountId . "_" . $item->pk;
+                            $findMedia = ForLikes::find()->where(['token' => $token])->one();
+                            if (count($findMedia) === 0) {
+                                echo "\nadd mediaId:" . $item->pk;
+                                $forLike = new ForLikes();
+                                $forLike->userId = $accountId;
+                                $forLike->token = $token;
+                                $forLike->mediaId = $item->pk;
+                                $forLike->save();
+                            } else {
+                                echo "\nSkipping mediaId:" . $item->pk;
+                                echo "\nLast media for likes. Break";
+                                break;
+                            }
+                            if ($countMedia >= 5) {
+                                echo "\nMax media (5) for user. Break";
+                                break;
+                            }
+                        }
+                    } catch (\Exception $error) {
+                        $calendar = Scheduler::find()->where([
+                            'user' => $user->id,
+                            'task' => 6,
+                            'status' => 1
+                        ])->orderBy(['date' => 'desc'])->one();
+                        if (count($calendar) === 1) {
+                            $calendar->status = 2;
+                            $calendar->update();
+                        }
+                    }
+                }
+            }
+        }
+        if (!empty($result->next_max_id)) {
+            $this->getFollowers($instaApi, $user, $followAccountId, $accountId, $result->next_max_id);
         }
     }
 }

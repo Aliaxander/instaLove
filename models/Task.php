@@ -19,7 +19,9 @@ class Task extends \yii\base\Object
         '6' => '...ML last photo followers',
         '7' => 'Process ML last photo followers',
         '8' => '...ML last photo account followers',
-        '9' => 'Process ML last photo account followers'
+        '9' => 'Process ML last photo account followers',
+        '10' => '...Follow old followings',
+        '11' => 'Process Follow old followings'
     ];
     
     

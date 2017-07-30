@@ -50,7 +50,7 @@ class AdminController extends Controller
                     [':user' => $user->id])->count('id');
             }
             //статистика процесса фолловинга
-            if ($user->task === 3) {
+            if ($user->task === 3 || $user->task === 11) {
                 $progress1 = Followings::find()->where('userId=:user and status=1',
                     [':user' => $user->id])->count('id');
                 $progress2 = Followings::find()->where('userId=:user and status=1 and isComplete=1',
