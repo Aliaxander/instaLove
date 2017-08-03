@@ -24,6 +24,7 @@ use yii\console\Controller;
 class LikeNoFollowersController extends Controller
 {
     public $id;
+    public $user;
     
     public function actionIndex()
     {
