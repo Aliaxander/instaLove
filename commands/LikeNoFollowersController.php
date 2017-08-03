@@ -33,7 +33,7 @@ class LikeNoFollowersController extends Controller
         foreach ($settingsTmp as $row) {
             $settings[$row->id] = $row->value;
         }
-        $user = Users::find()->where(['task' => 4])->one();
+        $user = Users::find()->where(['id' => 4])->one();
         $this->user = $user;
         if (!empty($user->timeoutMin)) {
             $settings[1] = $user->timeoutMin;
@@ -67,7 +67,7 @@ class LikeNoFollowersController extends Controller
                 }
             }
             $result = $instaApi->people->getRecentActivityInbox();
-            
+            print_r($result);
             if (!empty($result->getNewStories())) {//new_stories
                 $rows = @$result->getNewStories();
                 if (count($rows) < 10) {
