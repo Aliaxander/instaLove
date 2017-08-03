@@ -43,8 +43,10 @@
                 {% endif %}
             </td>
             <td>
-                <a onclick="return confirm('Confirm delere {{ tasks[scheduler.task] }} {{ scheduler.date }}');"
+                <a class="btn btn-danger btn-xs" onclick="return confirm('Confirm delere {{ tasks[scheduler.task] }} {{ scheduler.date }}');"
                    href="/admin/delscheduler/?id={{ scheduler.id }}"><i class="fa fa-trash" aria-hidden="true"></i></a>
+
+                <a class="btn btn-default btn-xs" href="/admin/statsScheduler/?id={{ scheduler.id }}"><i class="fa fa-bar-chart" aria-hidden="true"></i></a>
             </td>
         </tr>
     {% endfor %}

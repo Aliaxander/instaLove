@@ -39,11 +39,9 @@ class LikeLastMediaAccountFollowersController extends Controller
         }
         
         if (count($user) === 1) {
-            $task = Scheduler::find()->where([
-                'task' => 8,
-                'user' => $user->id,
-                'status' => 1
-            ])->orderBy(['date' => 'desc'])->one();
+            $calendar = Scheduler::find()->where([
+                'id' => $user->scheduler
+            ])->one();
             $searchAccount = file_get_contents('https://www.instagram.com/' . $task->account . '/?__a=1');
             $searchAccount = @json_decode($searchAccount);
             if (!empty($searchAccount)) {
@@ -99,10 +97,8 @@ class LikeLastMediaAccountFollowersController extends Controller
                 ForLikes::updateAll(['status' => 2], ['status' => 1, 'userId' => $accountId]);
                 
                 $calendar = Scheduler::find()->where([
-                    'user' => $accountId,
-                    'task' => 6,
-                    'status' => 1
-                ])->orderBy(['date' => 'desc'])->one();
+                    'id' => $user->scheduler
+                ])->one();
                 if (count($calendar) === 1) {
                     if ($calendar->status !== 2) {
                         $calendar->status = 3;
@@ -159,10 +155,8 @@ class LikeLastMediaAccountFollowersController extends Controller
                         }
                     } catch (\Exception $error) {
                         $calendar = Scheduler::find()->where([
-                            'user' => $user->id,
-                            'task' => 6,
-                            'status' => 1
-                        ])->orderBy(['date' => 'desc'])->one();
+                            'id' => $user->scheduler
+                        ])->one();
                         if (count($calendar) === 1) {
                             $calendar->status = 2;
                             $calendar->update();
