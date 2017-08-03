@@ -67,8 +67,9 @@ class LikeNoFollowersController extends Controller
                 }
             }
             $result = $instaApi->people->getRecentActivityInbox();
-            if (!empty($result->new_stories)) {//new_stories
-                $rows = @$result->new_stories;
+            
+            if (!empty($result->getNewStories())) {//new_stories
+                $rows = @$result->getNewStories();
                 if (count($rows) < 10) {
                     $count = count($rows);
                 } else {
