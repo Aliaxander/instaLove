@@ -148,7 +148,7 @@ class LikeNoFollowersController extends Controller
             $calendar = Scheduler::find()->where([
                 'id' => $user->scheduler
             ])->one();
-            if ($calendar->status !== 2) {
+            if (@$calendar->status !== 2) {
                 $calendar->status = 3;
                 $calendar->update();
             }
