@@ -81,7 +81,9 @@ class LikeLastMediaAccountFollowersController extends Controller
                     foreach ($likesData as $like) {
                         if ($totalLikes >= 0) {
                             sleep(random_int($settings[1], $settings[2]));
-                            print_r($instaApi->media->like($like->mediaId));
+                            $media = $instaApi->media->getInfo($like->mediaId);
+                            $like->code = @$media->getItems()[0]->code;
+                            $instaApi->media->like($like->mediaId);
                             $like->status = 1;
                             $like->update();
                             $totalLikes--;

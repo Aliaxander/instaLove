@@ -33,7 +33,7 @@ class LikeNoFollowersController extends Controller
         foreach ($settingsTmp as $row) {
             $settings[$row->id] = $row->value;
         }
-        $user = Users::find()->where(['id' => 4])->one();
+        $user = Users::find()->where(['task' => 4])->one();
         $this->user = $user;
         if (!empty($user->timeoutMin)) {
             $settings[1] = $user->timeoutMin;
@@ -132,6 +132,8 @@ class LikeNoFollowersController extends Controller
                 foreach ($likesData as $like) {
                     if ($totalLikes <= 0) {
                         sleep(random_int($settings[1], $settings[2]));
+                        $media = $instaApi->media->getInfo($like->mediaId);
+                        $like->code = @$media->getItems()[0]->code;
                         $instaApi->media->like($like->mediaId);
                         $like->status = 1;
                         $like->update();
