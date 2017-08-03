@@ -51,6 +51,7 @@ class ParseController extends Controller
                     try {
                         $instaApi->login(true);
                         $user->status = 1;
+                        $user->scheduler = 0;
                         $user->update();
                     } catch (\Exception $error) {
                         throw new CheckpointException($user, $error->getMessage());
@@ -64,6 +65,7 @@ class ParseController extends Controller
                         try {
                             $instaApi->login(true);
                             $user->status = 1;
+                            $user->scheduler = 0;
                             $user->update();
                             $this->parseFollowings($instaApi);
                             $this->parseFollowers($instaApi);

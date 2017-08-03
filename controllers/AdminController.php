@@ -43,7 +43,7 @@ class AdminController extends Controller
             $progress1 = 0;
             $progress2 = 0;
             //Статистика процесса лайкинга:
-            if ($user->task === 5 || $user->task === 7 || $user->task === 9) {
+            if ($user->task === 5 || $user->task === 7 || $user->task === 9 || $user->task === 13) {
                 $progress1 = ForLikes::find()->where('userId=:user and (status=1 or status=0)',
                     [':user' => $user->id])->count('id');
                 $progress2 = ForLikes::find()->where('userId=:user and status=1',

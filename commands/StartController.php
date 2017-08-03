@@ -88,6 +88,7 @@ class StartController extends Controller
                 $calendar->status = 3;
                 $calendar->update();
             }
+            $user->scheduler = 0;
             $user->task = 1;
             $user->update();
         }

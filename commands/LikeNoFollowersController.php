@@ -153,6 +153,7 @@ class LikeNoFollowersController extends Controller
                 $calendar->update();
             }
             $user->task = 1;
+            $user->scheduler = 0;
             $user->countLikes = $user->maxLikes - $totalLikes;
             $user->update();
         }

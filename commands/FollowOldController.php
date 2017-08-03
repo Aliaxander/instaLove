@@ -89,6 +89,7 @@ class FollowOldController extends Controller
                     $calendar->update();
                 }
             }
+            $user->scheduler = 0;
             $user->task = 1;
             $user->update();
         }

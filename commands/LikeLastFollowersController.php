@@ -144,6 +144,7 @@ class LikeLastFollowersController extends Controller
                 }
             }
             $user->task = 1;
+            $user->scheduler = 0;
             $user->countLikes = $user->maxLikes - $totalLikes;
             $user->update();
         }

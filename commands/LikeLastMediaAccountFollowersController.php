@@ -109,6 +109,7 @@ class LikeLastMediaAccountFollowersController extends Controller
                 }
                 
                 $user->task = 1;
+                $user->scheduler = 0;
                 $user->countLikes = $user->maxLikes - $totalLikes;
                 $user->update();
             }
@@ -144,6 +145,7 @@ class LikeLastMediaAccountFollowersController extends Controller
                                 $forLike->userId = $accountId;
                                 $forLike->token = $token;
                                 $forLike->mediaId = $item->pk;
+                                $forLike->scheduler = $user->scheduler;
                                 $forLike->save();
                             } else {
                                 echo "\nSkipping mediaId:" . $item->pk;
