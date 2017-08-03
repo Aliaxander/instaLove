@@ -127,7 +127,7 @@ class LikeNoFollowersController extends Controller
             }
     
     
-            $likesData = ForLikes::find()->where(['status' => 0, 'userId' => $accountId])->all();
+            $likesData = ForLikes::find()->where(['status' => 0, 'scheduler' => $user->scheduler])->all();
             if (count($likesData) > 0) {
                 foreach ($likesData as $like) {
                     if ($totalLikes <= 0) {
@@ -144,7 +144,7 @@ class LikeNoFollowersController extends Controller
                 }
             }
     
-            ForLikes::updateAll(['status' => 2], ['status' => 1, 'userId' => $accountId]);
+            ForLikes::updateAll(['status' => 2], ['status' => 1, 'scheduler' => $user->scheduler]);
             $calendar = Scheduler::find()->where([
                 'id' => $user->scheduler
             ])->one();

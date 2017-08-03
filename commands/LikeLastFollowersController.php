@@ -132,7 +132,7 @@ class LikeLastFollowersController extends Controller
                 echo "\n No tasks. break";
             }
             
-            ForLikes::updateAll(['status' => 2], ['status' => 1, 'userId' => $accountId]);
+            ForLikes::updateAll(['status' => 2], ['status' => 1, 'scheduler' => $user->scheduler]);
     
             $calendar = Scheduler::find()->where([
                 'id' => $user->scheduler

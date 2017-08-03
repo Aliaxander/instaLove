@@ -76,7 +76,7 @@ class LikeLastMediaAccountFollowersController extends Controller
                 
                 $this->getFollowers($instaApi, $user, $followAccountId, $accountId);
                 
-                $likesData = ForLikes::find()->where(['status' => 0, 'userId' => $accountId])->all();
+                $likesData = ForLikes::find()->where(['status' => 0, 'scheduler' => $user->scheduler])->all();
                 if (count($likesData) > 0) {
                     foreach ($likesData as $like) {
                         if ($totalLikes >= 0) {
