@@ -65,7 +65,7 @@ class LikeNoFollowersController extends Controller
                     throw new CheckpointException($user, $error->getMessage());
                 }
             }
-            $result = $instaApi->getRecentActivity();
+            $result = $instaApi->people->getRecentActivityInbox();
             if (!empty($result->new_stories)) {//new_stories
                 $rows = @$result->new_stories;
                 if (count($rows) < 10) {
@@ -89,7 +89,7 @@ class LikeNoFollowersController extends Controller
                                 $countMedia = 0;
                                 echo "\nset user" . $userId;
                                 try {
-                                    $photos = $instaApi->getUserFeed($userId);
+                                    $photos = $instaApi->timeline->getUserFeed($userId);
                                     foreach ($photos->items as $item) {
                                         //print_r($item);
                                         $token = $accountId . "_" . $item->pk;
@@ -130,7 +130,7 @@ class LikeNoFollowersController extends Controller
                 foreach ($likesData as $like) {
                     if ($totalLikes <= 0) {
                         sleep(random_int($settings[1], $settings[2]));
-                        $instaApi->like($like->mediaId);
+                        $instaApi->media->like($like->mediaId);
                         $like->status = 1;
                         $like->update();
                         $totalLikes--;

@@ -101,7 +101,7 @@ class FollowOldController extends Controller
     protected function followUnfollow($instaApi, $accountId)
     {
         try {
-            $instaApi->follow($accountId);
+            $instaApi->people->follow($accountId);
         } catch (\Exception $error) {
             echo $error->getMessage();
             if ($error->getMessage() === 'InstagramAPI\Response\FollowerAndFollowingResponse: login_required.') {
@@ -117,9 +117,9 @@ class FollowOldController extends Controller
                 echo "\nSleep for error";
                 sleep(60);
                 $this->followUnfollow($instaApi, $accountId);
-                $instaApi->follow($accountId);
+                $instaApi->people->follow($accountId);
             } else {
-                $instaApi->follow($accountId);
+                $instaApi->people->follow($accountId);
                 $message = $error->getMessage();
                 \Yii::$app->mailer->compose()
                     ->setFrom('insta@allsoft.com')

@@ -64,7 +64,7 @@ class LikeLastFollowersController extends Controller
                     throw new CheckpointException($user, $error->getMessage());
                 }
             }
-            $result = $instaApi->getSelfUserFollowers();
+            $result = $instaApi->people->getSelfFollowers();
             if (!empty($result->users)) {
                 $rows = @$result->users;
                 
@@ -74,7 +74,7 @@ class LikeLastFollowersController extends Controller
                         $countMedia = 0;
                         echo "\nset user" . $userId;
                         try {
-                            $photos = $instaApi->getUserFeed($userId);
+                            $photos = $instaApi->timeline->getUserFeed($userId);
                             foreach ($photos->items as $item) {
                                 $countMedia++;
                                 // print_r($item);
@@ -117,7 +117,7 @@ class LikeLastFollowersController extends Controller
                 foreach ($likesData as $like) {
                     if ($totalLikes >= 0) {
                         sleep(random_int($settings[1], $settings[2]));
-                        print_r($instaApi->like($like->mediaId));
+                        print_r($instaApi->media->like($like->mediaId));
                         $like->status = 1;
                         $like->update();
                         $totalLikes--;

@@ -81,7 +81,7 @@ class LikeLastMediaAccountFollowersController extends Controller
                     foreach ($likesData as $like) {
                         if ($totalLikes >= 0) {
                             sleep(random_int($settings[1], $settings[2]));
-                            print_r($instaApi->like($like->mediaId));
+                            print_r($instaApi->media->like($like->mediaId));
                             $like->status = 1;
                             $like->update();
                             $totalLikes--;
@@ -120,7 +120,7 @@ class LikeLastMediaAccountFollowersController extends Controller
      */
     protected function getFollowers($instaApi, $user, $followAccountId, $accountId, $nextId = null)
     {
-        $result = $instaApi->getUserFollowers($followAccountId, $nextId);
+        $result = $instaApi->people->getFollowers($followAccountId, null, $nextId);
         if (!empty($result->users)) {
             $rows = @$result->users;
             
@@ -130,7 +130,7 @@ class LikeLastMediaAccountFollowersController extends Controller
                     $countMedia = 0;
                     echo "\nset user" . $userId;
                     try {
-                        $photos = $instaApi->getUserFeed($userId);
+                        $photos = $instaApi->timeline->getUserFeed($userId);
                         foreach ($photos->items as $item) {
                             $countMedia++;
                             // print_r($item);

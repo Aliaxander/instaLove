@@ -19,7 +19,7 @@
         "yiisoft/yii2-bootstrap": "~2.0.0",
         "yiisoft/yii2-swiftmailer": "~2.0.0",
         "yiisoft/yii2-twig": "^2.1",
-        "mgp25/instagram-php": "^2.0"
+        "mgp25/instagram-php": "@dev"
     },
     "require-dev": {
         "yiisoft/yii2-debug": "~2.0.0",
