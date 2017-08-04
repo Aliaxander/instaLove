@@ -13,6 +13,7 @@
 	</thead>
 	<tbody>
     <?php
+
     use app\models\Status;
 
     if (!empty($users)) {
@@ -31,21 +32,15 @@
                     <?= $progress[$user->id] ?>
 				</td>
 				<td style="width: 240px;">
-                   <!-- <?php
-                    if ($user->task == 1) {
+                    <?php
+                    if (in_array($taskIdAll[$user->id], [13, 11, 9, 7, 5, 3])) {
                         ?>
-						<a class="btn btn-xs btn-default" href="/admin/start/?task=2&id=<?= $user->id ?>"><i
-									class="fa fa-play"
-									aria-hidden="true"></i></a>
-                        <?php
-                    } else {
-                        ?>
-						<a class="btn btn-xs btn-default" href="/admin/start/?task=1&id=<?= $user->id ?>"><i
-									class="fa fa-pause"
+						<a class="btn btn-xs btn-default" href="/admin/reload-task/?id=<?= $user->id ?>"><i
+									class="fa fa-refresh" title="reload task"
 									aria-hidden="true"></i></a>
                         <?php
                     }
-                    ?>-->
+                    ?>
 					<a class="btn btn-xs btn-default" href="/admin/edit/?id=<?= $user->id ?>"><i
 								class="fa fa-pencil"
 								aria-hidden="true"></i></a>

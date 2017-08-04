@@ -42,6 +42,7 @@ class AdminController extends Controller
             $progress = '';
             $progress1 = 0;
             $progress2 = 0;
+            $taskIdAll[$user->id] = $user->task;
             //Статистика процесса лайкинга:
             if ($user->task === 5 || $user->task === 7 || $user->task === 9 || $user->task === 13) {
                 $progress1 = ForLikes::find()->where('userId=:user and (status=1 or status=0)',
@@ -88,7 +89,8 @@ class AdminController extends Controller
             'users' => $users,
             'status' => Status::getAll(),
             'progress' => $progressAll,
-            'followers' => $followersAll
+            'followers' => $followersAll,
+            'taskIdAll' => $taskIdAll
         ]);
     }
     
@@ -99,6 +101,15 @@ class AdminController extends Controller
         return $this->render('stats.twig', ['stats' => $stats]);
     }
     
+    public function actionReloadTask()
+    {
+        $stats = Users::findOne(['id' => Yii::$app->request->get('id')]);
+        $stats->task = $stats->task - 1;
+        $stats->update();
+        
+        return $this->redirect(Yii::$app->request->referrer);
+    }
+
     public function actionScheduler($id)
     {
         $scheduler = Scheduler::find()->where(['user' => Yii::$app->request->get('id')])->orderBy('date desc')->all();

@@ -24,7 +24,7 @@ class CheckpointException extends \RuntimeException
     public function __construct($user, $error)
     {
         if (preg_match("/Network: cURL error /", $error)) {
-            if (in_array($user->task, [11, 9, 7, 5, 3])) {
+            if (in_array($user->task, [13, 11, 9, 7, 5, 3])) {
                 $task = $user->task - 1;
             } else {
                 $task = $user->task;
