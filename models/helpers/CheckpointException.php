@@ -23,11 +23,11 @@ class CheckpointException extends \RuntimeException
      */
     public function __construct($user, $error)
     {
-        if (preg_match("/Network: cURL error 7: /", $error)) {
-            if (in_array($user['task'], [7, 5, 3])) {
-                $task = $user['task'] - 1;
+        if (preg_match("/Network: cURL error /", $error)) {
+            if (in_array($user->task, [11, 9, 7, 5, 3])) {
+                $task = $user->task - 1;
             } else {
-                $task = $user['task'];
+                $task = $user->task;
             }
             \Yii::$app->db->createCommand("UPDATE users set status=3, task={$task} where id=" . $user->id . "")->query();
             die($error);
