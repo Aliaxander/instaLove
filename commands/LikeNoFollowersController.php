@@ -7,6 +7,7 @@
 
 namespace app\commands;
 
+use app\models\Followers;
 use app\models\Followings;
 use app\models\ForLikes;
 use app\models\helpers\CheckpointException;
@@ -18,6 +19,7 @@ use yii\console\Controller;
 
 /**
  * Class LikeNoFollowersController
+ * like-no-followers
  *
  * @package app\commands
  */
@@ -33,7 +35,7 @@ class LikeNoFollowersController extends Controller
         foreach ($settingsTmp as $row) {
             $settings[$row->id] = $row->value;
         }
-        $user = Users::find()->where(['task' => 4])->one();
+        $user = Users::find()->where(['id' => 4])->one();
         $this->user = $user;
         if (!empty($user->timeoutMin)) {
             $settings[1] = $user->timeoutMin;
@@ -69,6 +71,7 @@ class LikeNoFollowersController extends Controller
             $result = $instaApi->people->getRecentActivityInbox();
             print_r($result);
             if (!empty($result->getNewStories())) {//new_stories
+                echo "\nNo empty stories. Start process:";
                 $rows = @$result->getNewStories();
                 if (count($rows) < 10) {
                     $count = count($rows);
@@ -80,10 +83,10 @@ class LikeNoFollowersController extends Controller
                     if ($row->type === 1) {
                         $i++;
                         $userId = $row->args->profile_id;
-                        
+                
                         $findFollow = Followings::find()->where(['followId' => $userId, 'userId' => $accountId])->one();
                         if (count($findFollow) === 0) {
-                            $findFollowers = Followings::find()->where([
+                            $findFollowers = Followers::find()->where([
                                 'followId' => $userId,
                                 'userId' => $accountId
                             ])->one();
@@ -116,10 +119,14 @@ class LikeNoFollowersController extends Controller
                                     $calendar->status = 2;
                                     $calendar->update();
                                 }
+                            } else {
+                                echo "\nUser followers" . $userId;
                             }
+                        } else {
+                            echo "\nUser following" . $userId;
                         }
                     }
-                    
+            
                     if ($i > $count) {
                         break;
                     }
@@ -130,11 +137,16 @@ class LikeNoFollowersController extends Controller
             $likesData = ForLikes::find()->where(['status' => 0, 'scheduler' => $user->scheduler])->all();
             if (count($likesData) > 0) {
                 foreach ($likesData as $like) {
-                    if ($totalLikes <= 0) {
+                    echo "\n Total likes for day: " . $totalLikes;
+                    if ($totalLikes > 0) {
                         sleep(random_int($settings[1], $settings[2]));
                         $media = $instaApi->media->getInfo($like->mediaId);
                         $like->code = @$media->getItems()[0]->code;
-                        $instaApi->media->like($like->mediaId);
+                        try {
+                            $instaApi->media->like($like->mediaId);
+                        } catch (\Exception $e) {
+                            print_r($e->getMessage());
+                        }
                         $like->status = 1;
                         $like->update();
                         $totalLikes--;
@@ -143,12 +155,16 @@ class LikeNoFollowersController extends Controller
                     }
                 }
             }
+            echo "\nFinal User data:";
+            print_r($user);
     
-            ForLikes::updateAll(['status' => 2], ['status' => 1, 'scheduler' => $user->scheduler]);
-            $calendar = Scheduler::find()->where([
-                'id' => $user->scheduler
-            ])->one();
-            if (@$calendar->status !== 2) {
+            echo "\nUpdate status task 2:";
+            var_dump(ForLikes::updateAll(['status' => 2], ['status' => 1, 'scheduler' => $user->scheduler]));
+    
+            echo "\nFind calendar:";
+            $calendar = Scheduler::findOne(['id' => $user->scheduler]);
+            print_r($calendar);
+            if (!empty($calendar) && $calendar->status !== 2) {
                 $calendar->status = 3;
                 $calendar->update();
             }
