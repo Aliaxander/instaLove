@@ -66,7 +66,7 @@ class LikeCommentsFollowingsController extends Controller
                     throw new CheckpointException($user, $error->getMessage());
                 }
             }
-            $followings = Followings::findAll(['userId' => $user->id, ['>', 'followers', 30000]]);
+            $followings = Followings::findAll(['userId' => $user->id, ['>', 'followers', 500000]]);
             
             foreach ($followings as $follow) {
                 $countMedia = 0;
