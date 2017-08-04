@@ -31,7 +31,7 @@
                     <?= $progress[$user->id] ?>
 				</td>
 				<td style="width: 240px;">
-                    <?php
+                   <!-- <?php
                     if ($user->task == 1) {
                         ?>
 						<a class="btn btn-xs btn-default" href="/admin/start/?task=2&id=<?= $user->id ?>"><i
@@ -45,7 +45,7 @@
 									aria-hidden="true"></i></a>
                         <?php
                     }
-                    ?>
+                    ?>-->
 					<a class="btn btn-xs btn-default" href="/admin/edit/?id=<?= $user->id ?>"><i
 								class="fa fa-pencil"
 								aria-hidden="true"></i></a>

@@ -43,18 +43,18 @@ class AdminController extends Controller
             $progress1 = 0;
             $progress2 = 0;
             //Статистика процесса лайкинга:
-            if ($user->task === 5 || $user->task === 7 || $user->task === 9) {
-                $progress1 = count(ForLikes::find()->where('userId=:user and (status=1 or status=0)',
-                    [':user' => $user->id])->all());
-                $progress2 = count(ForLikes::find()->where('userId=:user and status=1',
-                    [':user' => $user->id])->all());
+            if ($user->task === 5 || $user->task === 7 || $user->task === 9 || $user->task === 13) {
+                $progress1 = ForLikes::find()->where('userId=:user and (status=1 or status=0)',
+                    [':user' => $user->id])->count('id');
+                $progress2 = ForLikes::find()->where('userId=:user and status=1',
+                    [':user' => $user->id])->count('id');
             }
             //статистика процесса фолловинга
             if ($user->task === 3 || $user->task === 11) {
-                $progress1 = count(Followings::find()->where('userId=:user and status=1',
-                    [':user' => $user->id])->all());
-                $progress2 = count(Followings::find()->where('userId=:user and status=1 and isComplete=1',
-                    [':user' => $user->id])->all());
+                $progress1 = Followings::find()->where('userId=:user and status=1',
+                    [':user' => $user->id])->count('id');
+                $progress2 = Followings::find()->where('userId=:user and status=1 and isComplete=1',
+                    [':user' => $user->id])->count('id');
             }
             if (isset($progress1)) {
                 $procent = $progress1 / 100;
@@ -67,7 +67,7 @@ class AdminController extends Controller
             if (!empty($progress)) {
                 $progressAll[$user->id] .= " ($progress2/$progress1)";
             }
-            $followers = Followers::find()->where(['userId' => $user->id])->count("*");
+            $followers = Followers::find()->where(['userId' => $user->id])->count("id");
             $followersAll[$user->id] = $followers;
             
             if ($user->task == 1) {
@@ -83,7 +83,7 @@ class AdminController extends Controller
                 $user->task = Task::findIdentity($user->task);
             }
         }
-        
+    
         return $this->render('index', [
             'users' => $users,
             'status' => Status::getAll(),
@@ -94,8 +94,7 @@ class AdminController extends Controller
     
     public function actionScheduler($id)
     {
-        $scheduler = Scheduler::find()->where(['user' => Yii::$app->request->get('id')])->all();
-        
+        $scheduler = Scheduler::find()->where(['user' => Yii::$app->request->get('id')])->orderBy('date desc')->all();
         return $this->render('scheduler.twig',
             ['schedulers' => $scheduler, 'tasks' => Task::getAll(), 'id' => Yii::$app->request->get('id')]);
     }
@@ -140,7 +139,7 @@ class AdminController extends Controller
     
     public function actionSettings()
     {
-        
+    
         if (Yii::$app->request->isPost) {
             foreach (Yii::$app->request->post() as $key => $val) {
                 $data = Settings::findOne($key);
@@ -221,7 +220,7 @@ class AdminController extends Controller
                         'proxy' => Yii::$app->request->post('proxy'),
                     ]);
                     $one = microtime();
-                    
+            
                     $result = $client->request('get', '/');
                     var_dump($result->getStatusCode());
                     $two = microtime();
@@ -239,13 +238,14 @@ class AdminController extends Controller
             $model->timeoutMin = Yii::$app->request->post('timeoutMin');
             $model->timeoutMax = Yii::$app->request->post('timeoutMax');
             $model->maxLikes = Yii::$app->request->post('maxLikes');
-            
+            $model->likeTimeoutMin = Yii::$app->request->post('likeTimeoutMin');
+            $model->likeTimeoutMax = Yii::$app->request->post('likeTimeoutMax');
             $model->update();
             if (!$error) {
                 return $this->redirect('/admin');
             }
         }
-        
+    
         return $this->render('edit.twig', ['model' => $model, 'error' => $error]);
     }
     
@@ -253,10 +253,35 @@ class AdminController extends Controller
     {
         $model = new Users();
         if (Yii::$app->request->isPost) {
+            $speed = 0;
+            if (!empty(Yii::$app->request->post('proxy'))) {
+                try {
+                    $client = new Client([
+                        'base_uri' => 'https://instagram.com/',
+                        'timeout' => 4,
+                        'proxy' => Yii::$app->request->post('proxy'),
+                    ]);
+                    $one = microtime();
+            
+                    $result = $client->request('get', '/');
+                    var_dump($result->getStatusCode());
+                    $two = microtime();
+                    $speed = round($two - $one);
+                } catch (\Exception $e) {
+                    $error = $e->getMessage();
+                    $speed = '>4000';
+                }
+            }
+            $model->proxySpeed = $speed;
             $model->userName = Yii::$app->request->post('userName');
             $model->proxy = Yii::$app->request->post('proxy');
             $model->password = Yii::$app->request->post('password');
             $model->email = Yii::$app->request->post('email');
+            $model->timeoutMin = Yii::$app->request->post('timeoutMin');
+            $model->timeoutMax = Yii::$app->request->post('timeoutMax');
+            $model->maxLikes = Yii::$app->request->post('maxLikes');
+            $model->likeTimeoutMin = Yii::$app->request->post('likeTimeoutMin');
+            $model->likeTimeoutMax = Yii::$app->request->post('likeTimeoutMax');
             $model->save();
             
             return $this->redirect('/admin');

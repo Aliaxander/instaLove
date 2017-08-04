@@ -64,7 +64,7 @@ class LikeLastFollowersController extends Controller
                     throw new CheckpointException($user, $error->getMessage());
                 }
             }
-            $result = $instaApi->getSelfUserFollowers();
+            $result = $instaApi->people->getSelfFollowers();
             if (!empty($result->users)) {
                 $rows = @$result->users;
                 
@@ -74,7 +74,7 @@ class LikeLastFollowersController extends Controller
                         $countMedia = 0;
                         echo "\nset user" . $userId;
                         try {
-                            $photos = $instaApi->getUserFeed($userId);
+                            $photos = $instaApi->timeline->getUserFeed($userId);
                             foreach ($photos->items as $item) {
                                 $countMedia++;
                                 // print_r($item);
@@ -86,6 +86,7 @@ class LikeLastFollowersController extends Controller
                                     $forLike->userId = $accountId;
                                     $forLike->token = $token;
                                     $forLike->mediaId = $item->pk;
+                                    $forLike->scheduler=$user->scheduler;
                                     $forLike->save();
                                 } else {
                                     echo "\nSkipping mediaId:" . $item->pk;
@@ -99,10 +100,8 @@ class LikeLastFollowersController extends Controller
                             }
                         } catch (\Exception $error) {
                             $calendar = Scheduler::find()->where([
-                                'user' => $user->id,
-                                'task' => 6,
-                                'status' => 1
-                            ])->orderBy(['date' => 'desc'])->one();
+                                'id' => $user->scheduler
+                            ])->one();
                             if (count($calendar) === 1) {
                                 $calendar->status = 2;
                                 $calendar->update();
@@ -118,7 +117,9 @@ class LikeLastFollowersController extends Controller
                 foreach ($likesData as $like) {
                     if ($totalLikes >= 0) {
                         sleep(random_int($settings[1], $settings[2]));
-                        print_r($instaApi->like($like->mediaId));
+                        $media = $instaApi->media->getInfo($like->mediaId);
+                        $like->code = @$media->getItems()[0]->code;
+                        $instaApi->media->like($like->mediaId);
                         $like->status = 1;
                         $like->update();
                         $totalLikes--;
@@ -131,13 +132,11 @@ class LikeLastFollowersController extends Controller
                 echo "\n No tasks. break";
             }
             
-            ForLikes::updateAll(['status' => 2], ['status' => 1, 'userId' => $accountId]);
-            
+            ForLikes::updateAll(['status' => 2], ['status' => 1, 'scheduler' => $user->scheduler]);
+    
             $calendar = Scheduler::find()->where([
-                'user' => $accountId,
-                'task' => 6,
-                'status' => 1
-            ])->orderBy(['date' => 'desc'])->one();
+                'id' => $user->scheduler
+            ])->one();
             if (count($calendar) === 1) {
                 if ($calendar->status !== 2) {
                     $calendar->status = 3;
@@ -145,6 +144,7 @@ class LikeLastFollowersController extends Controller
                 }
             }
             $user->task = 1;
+            $user->scheduler = 0;
             $user->countLikes = $user->maxLikes - $totalLikes;
             $user->update();
         }

@@ -82,14 +82,13 @@ class StartController extends Controller
            
             Followings::updateAll(['isComplete' => 0], ['userId' => $user->id]);
             $calendar = Scheduler::find()->where([
-                'user' => $user->id,
-                'task' => 2,
-                'status' => 1
-            ])->orderBy(['date' => 'desc'])->one();
+                'id' => $user->scheduler
+            ])->one();
             if ($calendar->status !== 2) {
                 $calendar->status = 3;
                 $calendar->update();
             }
+            $user->scheduler = 0;
             $user->task = 1;
             $user->update();
         }
@@ -104,11 +103,11 @@ class StartController extends Controller
     {
         try {
             if ($isFollow === 1) {
-                $instaApi->follow($accountId);
+                $instaApi->people->follow($accountId);
                 echo ' - Ok follow';
             } else {
                 echo ' - unfollow ok';
-                $instaApi->unfollow($accountId);
+                $instaApi->people->unfollow($accountId);
             }
         } catch (\Exception $error) {
             echo $error->getMessage();
@@ -125,9 +124,9 @@ class StartController extends Controller
                 echo "\nSleep for error";
                 sleep(60);
                 $this->followUnfollow($instaApi, $accountId, $isFollow);
-                $instaApi->follow($accountId);
+                $instaApi->people->follow($accountId);
             } else {
-                $instaApi->follow($accountId);
+                $instaApi->people->follow($accountId);
                 $message = $error->getMessage();
                 \Yii::$app->mailer->compose()
                     ->setFrom('insta@allsoft.com')
@@ -137,10 +136,8 @@ class StartController extends Controller
                     ->send();
     
                 $calendar = Scheduler::find()->where([
-                    'user' => $this->user->id,
-                    'task' => 2,
-                    'status' => 1
-                ])->orderBy(['date' => 'desc'])->one();
+                    'id' => $this->user->scheduler
+                ])->one();
                 $calendar->status = 2;
                 $calendar->update();
     

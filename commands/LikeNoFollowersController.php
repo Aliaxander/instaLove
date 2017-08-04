@@ -24,6 +24,7 @@ use yii\console\Controller;
 class LikeNoFollowersController extends Controller
 {
     public $id;
+    public $user;
     
     public function actionIndex()
     {
@@ -65,9 +66,10 @@ class LikeNoFollowersController extends Controller
                     throw new CheckpointException($user, $error->getMessage());
                 }
             }
-            $result = $instaApi->getRecentActivity();
-            if (!empty($result->new_stories)) {//new_stories
-                $rows = @$result->new_stories;
+            $result = $instaApi->people->getRecentActivityInbox();
+            print_r($result);
+            if (!empty($result->getNewStories())) {//new_stories
+                $rows = @$result->getNewStories();
                 if (count($rows) < 10) {
                     $count = count($rows);
                 } else {
@@ -89,7 +91,7 @@ class LikeNoFollowersController extends Controller
                                 $countMedia = 0;
                                 echo "\nset user" . $userId;
                                 try {
-                                    $photos = $instaApi->getUserFeed($userId);
+                                    $photos = $instaApi->timeline->getUserFeed($userId);
                                     foreach ($photos->items as $item) {
                                         //print_r($item);
                                         $token = $accountId . "_" . $item->pk;
@@ -100,6 +102,7 @@ class LikeNoFollowersController extends Controller
                                             $forLike->userId = $accountId;
                                             $forLike->token = $token;
                                             $forLike->mediaId = $item->pk;
+                                            $forLike->scheduler = $user->scheduler;
                                             $forLike->save();
                                         }
                                         if ($countMedia >= 10) {
@@ -108,10 +111,8 @@ class LikeNoFollowersController extends Controller
                                     }
                                 } catch (\Exception $error) {
                                     $calendar = Scheduler::find()->where([
-                                        'user' => $user->id,
-                                        'task' => 4,
-                                        'status' => 1
-                                    ])->orderBy(['date' => 'desc'])->one();
+                                        'id' => $user->scheduler
+                                    ])->one();
                                     $calendar->status = 2;
                                     $calendar->update();
                                 }
@@ -126,12 +127,14 @@ class LikeNoFollowersController extends Controller
             }
     
     
-            $likesData = ForLikes::find()->where(['status' => 0, 'userId' => $accountId])->all();
+            $likesData = ForLikes::find()->where(['status' => 0, 'scheduler' => $user->scheduler])->all();
             if (count($likesData) > 0) {
                 foreach ($likesData as $like) {
                     if ($totalLikes <= 0) {
                         sleep(random_int($settings[1], $settings[2]));
-                        $instaApi->like($like->mediaId);
+                        $media = $instaApi->media->getInfo($like->mediaId);
+                        $like->code = @$media->getItems()[0]->code;
+                        $instaApi->media->like($like->mediaId);
                         $like->status = 1;
                         $like->update();
                         $totalLikes--;
@@ -141,17 +144,16 @@ class LikeNoFollowersController extends Controller
                 }
             }
     
-            ForLikes::updateAll(['status' => 2], ['status' => 1, 'userId' => $accountId]);
+            ForLikes::updateAll(['status' => 2], ['status' => 1, 'scheduler' => $user->scheduler]);
             $calendar = Scheduler::find()->where([
-                'user' => $accountId,
-                'task' => 4,
-                'status' => 1
-            ])->orderBy(['date' => 'desc'])->one();
-            if ($calendar->status !== 2) {
+                'id' => $user->scheduler
+            ])->one();
+            if (@$calendar->status !== 2) {
                 $calendar->status = 3;
                 $calendar->update();
             }
             $user->task = 1;
+            $user->scheduler = 0;
             $user->countLikes = $user->maxLikes - $totalLikes;
             $user->update();
         }

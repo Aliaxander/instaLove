@@ -29,22 +29,26 @@
                     ML last 5 photo Selected account followers @{{ scheduler.account }}
                 {% elseif scheduler.task=='10' %}
                     Follow old followings
+                {% elseif scheduler.task=='12' %}
+                    Like comments
                 {% endif %}
             </td>
             <td>
                 {% if scheduler.status==0 %}
                     Scheduled
                 {% elseif scheduler.status==1 %}
-                    Running
+                    {{ scheduler.dateUpdate }} - Running
                 {% elseif scheduler.status==2 %}
-                    ERROR
+                    {{ scheduler.dateUpdate }} - ERROR
                 {% elseif scheduler.status==3 %}
-                    Completed
+                    {{ scheduler.dateUpdate }} - Completed
                 {% endif %}
             </td>
             <td>
-                <a onclick="return confirm('Confirm delere {{ tasks[scheduler.task] }} {{ scheduler.date }}');"
+                <a class="btn btn-danger btn-xs" onclick="return confirm('Confirm delere {{ tasks[scheduler.task] }} {{ scheduler.date }}');"
                    href="/admin/delscheduler/?id={{ scheduler.id }}"><i class="fa fa-trash" aria-hidden="true"></i></a>
+
+                <a class="btn btn-default btn-xs" href="/admin/statsScheduler/?id={{ scheduler.id }}"><i class="fa fa-bar-chart" aria-hidden="true"></i></a>
             </td>
         </tr>
     {% endfor %}
@@ -59,6 +63,7 @@
             <option value="6">ML last 5 photo followers</option>
             <option value="8">ML last 5 photo Selected account followers</option>
             <option value="10">Follow old followings</option>
+            <option value="12">Like comments</option>
         </select></div>
 </div>
 <div class="row">
