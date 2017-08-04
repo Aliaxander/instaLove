@@ -70,9 +70,9 @@ class LikeNoFollowersController extends Controller
             }
             $result = $instaApi->people->getRecentActivityInbox();
             print_r($result);
-            if (!empty($result->getNewStories())) {//new_stories
+            if (!empty($result->new_stories)) {//new_stories
                 echo "\nNo empty stories. Start process:";
-                $rows = @$result->getNewStories();
+                $rows = @$result->new_stories;
                 if (count($rows) < 10) {
                     $count = count($rows);
                 } else {
@@ -81,7 +81,6 @@ class LikeNoFollowersController extends Controller
                 $i = 0;
                 foreach ($rows as $row) {
                     if ($row->type === 1) {
-                        $i++;
                         $userId = $row->args->profile_id;
                 
                         $findFollow = Followings::find()->where(['followId' => $userId, 'userId' => $accountId])->one();
@@ -91,6 +90,7 @@ class LikeNoFollowersController extends Controller
                                 'userId' => $accountId
                             ])->one();
                             if (count($findFollowers) === 0) {
+                                $i++;
                                 $countMedia = 0;
                                 echo "\nset user" . $userId;
                                 try {
@@ -125,9 +125,12 @@ class LikeNoFollowersController extends Controller
                         } else {
                             echo "\nUser following" . $userId;
                         }
+                    } else {
+                        echo "type !=1";
                     }
             
                     if ($i > $count) {
+                        echo "count >10";
                         break;
                     }
                 }
