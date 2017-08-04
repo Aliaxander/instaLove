@@ -35,7 +35,7 @@ class LikeNoFollowersController extends Controller
         foreach ($settingsTmp as $row) {
             $settings[$row->id] = $row->value;
         }
-        $user = Users::find()->where(['id' => 4])->one();
+        $user = Users::find()->where(['task' => 4])->one();
         $this->user = $user;
         if (!empty($user->timeoutMin)) {
             $settings[1] = $user->timeoutMin;
@@ -69,74 +69,77 @@ class LikeNoFollowersController extends Controller
                 }
             }
             $result = $instaApi->people->getRecentActivityInbox();
-            print_r($result);
-            if (!empty($result->new_stories)) {//new_stories
-                echo "\nNo empty stories. Start process:";
-                $rows = @$result->new_stories;
-                if (count($rows) < 10) {
-                    $count = count($rows);
-                } else {
-                    $count = 10;
-                }
-                $i = 0;
-                foreach ($rows as $row) {
-                    if ($row->type === 1) {
-                        $userId = $row->args->profile_id;
-                
-                        $findFollow = Followings::find()->where(['followId' => $userId, 'userId' => $accountId])->one();
-                        if (count($findFollow) === 0) {
-                            $findFollowers = Followers::find()->where([
-                                'followId' => $userId,
-                                'userId' => $accountId
-                            ])->one();
-                            if (count($findFollowers) === 0) {
-                                $i++;
-                                $countMedia = 0;
-                                echo "\nset user" . $userId;
-                                try {
-                                    $photos = $instaApi->timeline->getUserFeed($userId);
-                                    foreach ($photos->items as $item) {
-                                        //print_r($item);
-                                        $token = $accountId . "_" . $item->pk;
-                                        $findMedia = ForLikes::find()->where(['token' => $token])->one();
-                                        if (count($findMedia) === 0) {
-                                            $countMedia++;
-                                            $forLike = new ForLikes();
-                                            $forLike->userId = $accountId;
-                                            $forLike->token = $token;
-                                            $forLike->mediaId = $item->pk;
-                                            $forLike->scheduler = $user->scheduler;
-                                            $forLike->save();
-                                        }
-                                        if ($countMedia >= 10) {
-                                            break;
-                                        }
+            if (!empty($result->getNewStories())) {
+                $stories = $result->getNewStories();
+            } else {
+                $stories = $result->getOldStories();
+            }
+            print_r($stories);
+            
+            echo "\nStart process:";
+            if (count($stories) < 10) {
+                $count = count($stories);
+            } else {
+                $count = 10;
+            }
+            $i = 0;
+            foreach ($stories as $row) {
+                if ($row->type === 1) {
+                    $userId = $row->args->profile_id;
+                    
+                    $findFollow = Followings::find()->where(['followId' => $userId, 'userId' => $accountId])->one();
+                    if (count($findFollow) === 0) {
+                        $findFollowers = Followers::find()->where([
+                            'followId' => $userId,
+                            'userId' => $accountId
+                        ])->one();
+                        if (count($findFollowers) === 0) {
+                            $i++;
+                            $countMedia = 0;
+                            echo "\nset user" . $userId;
+                            try {
+                                $photos = $instaApi->timeline->getUserFeed($userId);
+                                foreach ($photos->items as $item) {
+                                    //print_r($item);
+                                    $token = $accountId . "_" . $item->pk;
+                                    $findMedia = ForLikes::find()->where(['token' => $token])->one();
+                                    if (count($findMedia) === 0) {
+                                        $countMedia++;
+                                        $forLike = new ForLikes();
+                                        $forLike->userId = $accountId;
+                                        $forLike->token = $token;
+                                        $forLike->mediaId = $item->pk;
+                                        $forLike->scheduler = $user->scheduler;
+                                        $forLike->save();
                                     }
-                                } catch (\Exception $error) {
-                                    $calendar = Scheduler::find()->where([
-                                        'id' => $user->scheduler
-                                    ])->one();
-                                    $calendar->status = 2;
-                                    $calendar->update();
+                                    if ($countMedia >= 10) {
+                                        break;
+                                    }
                                 }
-                            } else {
-                                echo "\nUser followers" . $userId;
+                            } catch (\Exception $error) {
+                                $calendar = Scheduler::find()->where([
+                                    'id' => $user->scheduler
+                                ])->one();
+                                $calendar->status = 2;
+                                $calendar->update();
                             }
                         } else {
-                            echo "\nUser following" . $userId;
+                            echo "\nUser followers" . $userId;
                         }
                     } else {
-                        echo "type !=1";
+                        echo "\nUser following" . $userId;
                     }
-            
-                    if ($i > $count) {
-                        echo "count >10";
-                        break;
-                    }
+                } else {
+                    echo "type !=1";
+                }
+                
+                if ($i > $count) {
+                    echo "count >10";
+                    break;
                 }
             }
-    
-    
+            
+            
             $likesData = ForLikes::find()->where(['status' => 0, 'scheduler' => $user->scheduler])->all();
             if (count($likesData) > 0) {
                 foreach ($likesData as $like) {
@@ -160,10 +163,10 @@ class LikeNoFollowersController extends Controller
             }
             echo "\nFinal User data:";
             print_r($user);
-    
+            
             echo "\nUpdate status task 2:";
             var_dump(ForLikes::updateAll(['status' => 2], ['status' => 1, 'scheduler' => $user->scheduler]));
-    
+            
             echo "\nFind calendar:";
             $calendar = Scheduler::findOne(['id' => $user->scheduler]);
             print_r($calendar);
