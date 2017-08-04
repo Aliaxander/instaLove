@@ -68,7 +68,11 @@ class LikeNoFollowersController extends Controller
                     throw new CheckpointException($user, $error->getMessage());
                 }
             }
-            $result = $instaApi->people->getRecentActivityInbox();
+            try {
+                $result = $instaApi->people->getRecentActivityInbox();
+            } catch (\Exception $error) {
+                throw new CheckpointException($user, $error->getMessage());
+            }
             if (!empty($result->getNewStories())) {
                 $stories = $result->getNewStories();
             } else {
@@ -98,7 +102,11 @@ class LikeNoFollowersController extends Controller
                             $countMedia = 0;
                             echo "\nset user" . $userId;
                             try {
-                                $photos = $instaApi->timeline->getUserFeed($userId);
+                                try {
+                                    $photos = $instaApi->timeline->getUserFeed($userId);
+                                } catch (\Exception $error) {
+                                    throw new CheckpointException($user, $error->getMessage());
+                                }
                                 foreach ($photos->items as $item) {
                                     //print_r($item);
                                     $token = $accountId . "_" . $item->pk;
@@ -146,12 +154,16 @@ class LikeNoFollowersController extends Controller
                     echo "\n Total likes for day: " . $totalLikes;
                     if ($totalLikes > 0) {
                         sleep(random_int($settings[1], $settings[2]));
-                        $media = $instaApi->media->getInfo($like->mediaId);
+                        try {
+                            $media = $instaApi->media->getInfo($like->mediaId);
+                        } catch (\Exception $error) {
+                            throw new CheckpointException($user, $error->getMessage());
+                        }
                         $like->code = @$media->getItems()[0]->code;
                         try {
                             $instaApi->media->like($like->mediaId);
-                        } catch (\Exception $e) {
-                            print_r($e->getMessage());
+                        } catch (\Exception $error) {
+                            throw new CheckpointException($user, $error->getMessage());
                         }
                         $like->status = 1;
                         $like->update();

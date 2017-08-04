@@ -1,0 +1,28 @@
+<table class="table table-hover table-striped">
+    <thead>
+    <tr class="active">
+        <td>MediaId</td>
+        <td>CodeLink</td>
+        <td>Date update</td>
+        <td>Status</td>
+    </tr>
+    </thead>
+    <tbody>
+    {% for stat in stats %}
+        <tr class="active">
+            <td>{{ stat.mediaId }}</td>
+            <td><a href="https://www.instagram.com/p/{{ stat.code }}" target="_blank">{{ stat.code }}</a></td>
+            <td>{{ stat.dateUpdate }}</td>
+            <td>
+                {% if stat.status==0 %}
+                    wait
+                {% elseif stat.status==1 %}
+                    complete
+                {% else %}
+                    error
+                {% endif %}
+            </td>
+        </tr>
+    {% endfor %}
+    </tbody>
+</table>

@@ -92,6 +92,13 @@ class AdminController extends Controller
         ]);
     }
     
+    public function actionStatsScheduler()
+    {
+        $stats = ForLikes::findAll(['scheduler' => Yii::$app->request->get('id')]);
+        
+        return $this->render('stats.twig', ['stats' => $stats]);
+    }
+    
     public function actionScheduler($id)
     {
         $scheduler = Scheduler::find()->where(['user' => Yii::$app->request->get('id')])->orderBy('date desc')->all();
