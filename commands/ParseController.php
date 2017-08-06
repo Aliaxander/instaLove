@@ -33,7 +33,7 @@ class ParseController extends Controller
                 $task->update();
                 $this->id = $task->user;
                 $user = Users::findOne($this->id);
-                
+                Followers::deleteAll(['userId' => $task->user]);
                 $instaApi = new Instagram(true, true, [
                     'storage' => 'mysql',
                     'dbhost' => '103.250.22.104',

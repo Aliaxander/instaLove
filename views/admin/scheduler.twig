@@ -99,7 +99,21 @@
             success: function (result) {
                 console.log(result);
                 if (result > 0) {
-                    $('tbody').append('<tr><td>' + date + '</td><td>Follow/Unfollow</td><td>Scheduled</td><td><a onclick="return confirm(\'Confirmdelere\');" href="/admin/delscheduler/?id=' + result + '"><i class="fa fa-trash" aria-hidden="true"></i></a></td></tr>');
+                    var taskTxt = '';
+                    if (task == 2) {
+                        taskTxt = 'Follow/Unfollow';
+                    } else if (task == 4) {
+                        taskTxt = 'ML no follow';
+                    } else if (task == 6) {
+                        taskTxt = 'ML last 5 photo followers';
+                    } else if (task == 8) {
+                        taskTxt = ' ML last 5 photo Selected account followers @' + account;
+                    } else if (task == 10) {
+                        taskTxt = 'Follow old followings';
+                    } else if (task == 12) {
+                        taskTxt = 'Like comments';
+                    }
+                    $('tbody').append('<tr><td>' + date + '</td><td>' + taskTxt + '</td><td>Scheduled</td><td><a onclick="return confirm(\'Confirmdelere\');" href="/admin/delscheduler/?id=' + result + '"><i class="fa fa-trash" aria-hidden="true"></i></a></td></tr>');
                 }
                 $("#submit").val('Add').prop("disabled", false);
             },

@@ -39,6 +39,7 @@ class AdminController extends Controller
     {
         $users = Users::find()->all();
         foreach ($users as $user) {
+            $progressBar[$user->id] = 0;
             $progress = '';
             $progress1 = 0;
             $progress2 = 0;
@@ -61,9 +62,11 @@ class AdminController extends Controller
                 $procent = $progress1 / 100;
                 if ($procent != 0) {
                     $progress = round($progress2 / $procent);
+                    $progressBar[$user->id] = $progress;
                     $progress .= "%";
                 }
             }
+    
             $progressAll[$user->id] = $progress;
             if (!empty($progress)) {
                 $progressAll[$user->id] .= " ($progress2/$progress1)";
@@ -89,6 +92,7 @@ class AdminController extends Controller
             'users' => $users,
             'status' => Status::getAll(),
             'progress' => $progressAll,
+            'progressBar' => $progressBar,
             'followers' => $followersAll,
             'taskIdAll' => $taskIdAll
         ]);

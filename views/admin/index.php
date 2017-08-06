@@ -2,7 +2,6 @@
 	<thead>
 	<tr class="active">
 		<td>id</td>
-		<td>email</td>
 		<td>userName</td>
 		<td>proxy</td>
 		<td>status</td>
@@ -21,7 +20,6 @@
             ?>
 			<tr>
 				<td><?= $user->id ?></td>
-				<td><?= $user->email ?></td>
 				<td><a href="https://instagram.com/<?= $user->userName ?>" target="_blank"><?= $user->userName ?></a> (<?= $followers[$user->id] ?>)</td>
 				<td><?= $user->proxy ?></td>
 				<td><?= Status::findIdentity($user->status) ?></td>
@@ -29,7 +27,21 @@
                     <?= $user->task ?>
 				</td>
 				<td>
-                    <?= $progress[$user->id] ?>
+                    
+                    <?php
+                    if ($progress[$user->id]) {
+                        ?>
+						<div class="progress">
+							<div class="progress-bar progress-bar-striped progress-bar-animated" role="progressbar"
+							     aria-valuenow="<?= $progressBar[$user->id] ?>" aria-valuemin="0" aria-valuemax="100"
+							     style="width: <?= $progressBar[$user->id] ?>%">
+								<span><?= $progress[$user->id] ?></span>
+							</div>
+						</div>
+                        
+                        <?php
+                    }
+                    ?>
 				</td>
 				<td style="width: 240px;">
                     <?php
