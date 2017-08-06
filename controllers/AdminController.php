@@ -39,10 +39,10 @@ class AdminController extends Controller
     {
         $users = Users::find()->all();
         foreach ($users as $user) {
-            $progressBar[$user->id] = 0;
             $progress = '';
             $progress1 = 0;
             $progress2 = 0;
+            $progressBar[$user->id] = '';
             $taskIdAll[$user->id] = $user->task;
             //Статистика процесса лайкинга:
             if ($user->task === 5 || $user->task === 7 || $user->task === 9 || $user->task === 13) {
@@ -69,7 +69,7 @@ class AdminController extends Controller
     
             $progressAll[$user->id] = $progress;
             if (!empty($progress)) {
-                $progressAll[$user->id] .= " ($progress2/$progress1)";
+                $progressAll[$user->id] = "$progress2/$progress1";
             }
             $followers = Followers::find()->where(['userId' => $user->id])->count("id");
             $followersAll[$user->id] = $followers;
@@ -92,9 +92,9 @@ class AdminController extends Controller
             'users' => $users,
             'status' => Status::getAll(),
             'progress' => $progressAll,
-            'progressBar' => $progressBar,
             'followers' => $followersAll,
-            'taskIdAll' => $taskIdAll
+            'taskIdAll' => $taskIdAll,
+            'progressBar' => $progressBar
         ]);
     }
     

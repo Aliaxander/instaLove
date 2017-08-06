@@ -16,11 +16,11 @@
             <td>
                 {% if stat.status==0 %}
                     wait
-                {% elseif stat.status==1 %}
+                {% elseif stat.status==1 or  stat.status==2 %}
                     complete
                 {% else %}
                     complete
-                {% endif %}
+                {% error %}
             </td>
         </tr>
     {% endfor %}
