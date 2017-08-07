@@ -19,8 +19,8 @@
                 {% elseif stat.status==1 or  stat.status==2 %}
                     complete
                 {% else %}
-                    complete
-                {% error %}
+                    error
+                {% endif %}
             </td>
         </tr>
     {% endfor %}
