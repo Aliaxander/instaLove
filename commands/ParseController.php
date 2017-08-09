@@ -127,27 +127,16 @@ class ParseController extends Controller
         
         print_r($result);
         foreach ($result->users as $user) {
-            $followers = Followers::findOne(['token' => $this->id . '_' . $user->pk]);
-            if (count($followers) === 1) {
-                $model = $followers;
-                $model->profile_pic_url = $user->profile_pic_url;
-                $model->username = $user->username;
-                $model->full_name = $user->full_name;
-                $followCheck = $instaApi->people->getInfoById($user->pk);
-                $model->followers = $followCheck->user->follower_count;
-                $model->update();
-            } else {
-                $model = new Followers();
-                $model->token = $this->id . '_' . $user->pk;
-                $model->userId = $this->id;
-                $model->followId = $user->pk;
-                $model->profile_pic_url = $user->profile_pic_url;
-                $model->username = $user->username;
-                $model->full_name = $user->full_name;
-                $followCheck = $instaApi->people->getInfoById($user->pk);
-                $model->followers = $followCheck->user->follower_count;
-                $model->save();
-            }
+            $model = new Followers();
+            $model->token = $this->id . '_' . $user->pk;
+            $model->userId = $this->id;
+            $model->followId = $user->pk;
+            $model->profile_pic_url = $user->profile_pic_url;
+            $model->username = $user->username;
+            $model->full_name = $user->full_name;
+            $followCheck = $instaApi->people->getInfoById($user->pk);
+            $model->followers = $followCheck->user->follower_count;
+            $model->save();
         }
         if (!empty($result->next_max_id)) {
             $this->parseFollowers($instaApi, $result->next_max_id);
