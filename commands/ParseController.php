@@ -61,6 +61,7 @@ class ParseController extends Controller
                     $this->parseFollowings($instaApi);
                     $this->parseFollowers($instaApi);
                 } catch (\Exception $error) {
+                    print_r($error->getMessage());
                     if ($error->getMessage() === 'InstagramAPI\Response\FollowerAndFollowingResponse: login_required.') {
                         try {
                             $instaApi->login(true);
@@ -88,7 +89,7 @@ class ParseController extends Controller
     {
         $result = $instaApi->people->getSelfFollowing(null, $page);
         
-        print_r($result->users);
+        print_r($result);
         foreach ($result->users as $user) {
             $followings = Followings::findOne(['token' => $this->id . '_' . $user->pk]);
             if (count($followings) === 1) {
