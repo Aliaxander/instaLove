@@ -111,6 +111,7 @@ class ParseController extends Controller
                 $followCheck = $instaApi->people->getInfoById($user->pk);
                 $model->followers = $followCheck->user->follower_count;
                 $model->save();
+                sleep(rand(0, 3));
             }
         }
         if (!empty($result->next_max_id)) {
@@ -138,6 +139,7 @@ class ParseController extends Controller
             $followCheck = $instaApi->people->getInfoById($user->pk);
             $model->followers = $followCheck->user->follower_count;
             $model->save();
+            sleep(rand(0,3));
         }
         if (!empty($result->next_max_id)) {
             $this->parseFollowers($instaApi, $result->next_max_id);
