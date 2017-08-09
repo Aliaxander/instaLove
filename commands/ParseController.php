@@ -74,6 +74,8 @@ class ParseController extends Controller
                         }
                     }
                 }
+                $task->status = 2;
+                $task->update();
             }
         }
     }
@@ -85,7 +87,7 @@ class ParseController extends Controller
     protected function parseFollowings($instaApi, $page = null)
     {
         $result = $instaApi->people->getSelfFollowing(null, $page);
-    
+        
         print_r($result->users);
         foreach ($result->users as $user) {
             $followings = Followings::findOne(['token' => $this->id . '_' . $user->pk]);

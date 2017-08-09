@@ -1,9 +1,16 @@
 <div class="site-index">
     <div class="container">
-        {% if countCheck>0 %}
+        {% if countCheck==1 %}
             Checked now... Please, wait.
         {% else %}
             <a href="/admin/recheck/?id={{ id }}" class="btn btn-default">Refresh</a>
+            <script>
+                function passed() {
+                    location.reload();
+                }
+
+                setTimeout(passed, 30000);
+            </script>
         {% endif %}
         <table class="table table-hover table-striped">
             {% for user in users %}
