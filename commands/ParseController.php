@@ -61,6 +61,7 @@ class ParseController extends Controller
                     $this->parseFollowings($instaApi);
                     $this->parseFollowers($instaApi);
                 } catch (\Exception $error) {
+                    print_r($error->getMessage());
                     if ($error->getMessage() === 'InstagramAPI\Response\FollowerAndFollowingResponse: login_required.') {
                         try {
                             $instaApi->login(true);
@@ -74,6 +75,8 @@ class ParseController extends Controller
                         }
                     }
                 }
+                $task->status = 2;
+                $task->update();
             }
         }
     }
@@ -85,8 +88,8 @@ class ParseController extends Controller
     protected function parseFollowings($instaApi, $page = null)
     {
         $result = $instaApi->people->getSelfFollowing(null, $page);
-    
-        print_r($result->users);
+        
+        print_r($result);
         foreach ($result->users as $user) {
             $followings = Followings::findOne(['token' => $this->id . '_' . $user->pk]);
             if (count($followings) === 1) {
@@ -108,6 +111,7 @@ class ParseController extends Controller
                 $followCheck = $instaApi->people->getInfoById($user->pk);
                 $model->followers = $followCheck->user->follower_count;
                 $model->save();
+                sleep(rand(0, 3));
             }
         }
         if (!empty($result->next_max_id)) {
@@ -125,27 +129,17 @@ class ParseController extends Controller
         
         print_r($result);
         foreach ($result->users as $user) {
-            $followers = Followers::findOne(['token' => $this->id . '_' . $user->pk]);
-            if (count($followers) === 1) {
-                $model = $followers;
-                $model->profile_pic_url = $user->profile_pic_url;
-                $model->username = $user->username;
-                $model->full_name = $user->full_name;
-                $followCheck = $instaApi->people->getInfoById($user->pk);
-                $model->followers = $followCheck->user->follower_count;
-                $model->update();
-            } else {
-                $model = new Followers();
-                $model->token = $this->id . '_' . $user->pk;
-                $model->userId = $this->id;
-                $model->followId = $user->pk;
-                $model->profile_pic_url = $user->profile_pic_url;
-                $model->username = $user->username;
-                $model->full_name = $user->full_name;
-                $followCheck = $instaApi->people->getInfoById($user->pk);
-                $model->followers = $followCheck->user->follower_count;
-                $model->save();
-            }
+            $model = new Followers();
+            $model->token = $this->id . '_' . $user->pk;
+            $model->userId = $this->id;
+            $model->followId = $user->pk;
+            $model->profile_pic_url = $user->profile_pic_url;
+            $model->username = $user->username;
+            $model->full_name = $user->full_name;
+            $followCheck = $instaApi->people->getInfoById($user->pk);
+            $model->followers = $followCheck->user->follower_count;
+            $model->save();
+            sleep(rand(0,3));
         }
         if (!empty($result->next_max_id)) {
             $this->parseFollowers($instaApi, $result->next_max_id);
