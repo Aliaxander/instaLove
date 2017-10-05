@@ -93,6 +93,7 @@
 <script>
     function add() {
         var date = $('input[name="date"]').val();
+        var dateTo = $('input[name="dateTo"]').val();
         var task = $('select[name="task"]').val();
         var account = $('input[name="account"]').val();
 
@@ -100,7 +101,7 @@
         $.ajax({
             type: "POST",
             url: "/admin/ajax-add-scheduler",
-            data: "date=" + date + "&task=" + task + "&user={{ id }}" + "&account=" + account,
+            data: "date=" + date + "&dateTo=" + dateTo + "&task=" + task + "&user={{ id }}" + "&account=" + account,
             success: function (result) {
                 console.log(result);
                 if (result > 0) {
@@ -134,7 +135,7 @@
             var html = $('#edit-' + id).html();
             $('#editTd-' + id).html('<form id="form-' + id + '" onsubmit="update(' + id + ');return false;"><input type="hidden" name="id" value="' + id + '"> <div><div class="controls col-md-9" style="position: relative"><input class="form-control datetimepicker" name="date" value="' + html + '"></div><div class="col-md-3"><input class="btn btn-success" type="submit" value="save"></div></div></form>');
             $('.datetimepicker').datetimepicker({
-                format: 'DD-MM-YYYY H:mm',
+                format: 'YYYY-MM-DD HH:mm',
                 locale: 'ru',
                 defaultDate: new Date()
             });
@@ -164,7 +165,7 @@
 
 {% set script %}
     $('.datetimepicker').datetimepicker({
-    format: 'DD-MM-YYYY H:mm',
+    format: 'YYYY-MM-DD HH:mm',
     locale: 'ru',
     defaultDate:new Date()
     });
