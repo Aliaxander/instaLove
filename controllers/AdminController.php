@@ -134,9 +134,15 @@ class AdminController extends Controller
         if (Yii::$app->request->isPost) {
             $data = new Scheduler();
             // echo Yii::$app->request->post('date');
+    
             $myDateTime = \DateTime::createFromFormat('d-m-Y H:i', Yii::$app->request->post('date'));
             $newDateString = $myDateTime->format('Y-m-d H:i:s');
             $data->date = $newDateString;
+    
+            $myDateTime = \DateTime::createFromFormat('d-m-Y H:i', Yii::$app->request->post('date'));
+            $newDateString = $myDateTime->format('Y-m-d H:i:s');
+            $data->dateTo = $newDateString;
+            
             $data->task = Yii::$app->request->post('task');
             $data->user = Yii::$app->request->post('user');
             $data->account = Yii::$app->request->post('account');

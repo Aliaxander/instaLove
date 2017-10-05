@@ -72,7 +72,12 @@
 </div>
 <div class="row">
     <div class="col-md-3">
-        <input class="form-control" name="date" id="datetimepicker">
+        DateFrom
+        <input class="form-control datetimepicker" name="date">
+    </div>
+    <div class="col-md-3">
+        DateTo
+        <input class="form-control datetimepicker" name="dateTo">
     </div>
 </div>
 <div class="row" id="accountForm" style="display: none">
@@ -129,7 +134,7 @@
             var html = $('#edit-' + id).html();
             $('#editTd-' + id).html('<form id="form-' + id + '" onsubmit="update(' + id + ');return false;"><input type="hidden" name="id" value="' + id + '"> <div><div class="controls col-md-9" style="position: relative"><input class="form-control datetimepicker" name="date" value="' + html + '"></div><div class="col-md-3"><input class="btn btn-success" type="submit" value="save"></div></div></form>');
             $('.datetimepicker').datetimepicker({
-                format: 'DD-MM-YYYY HH:mm',
+                format: 'DD-MM-YYYY H:mm',
                 locale: 'ru',
                 defaultDate: new Date()
             });
@@ -158,8 +163,8 @@
 </script>
 
 {% set script %}
-    $('#datetimepicker').datetimepicker({
-    format: 'DD-MM-YYYY HH:mm',
+    $('.datetimepicker').datetimepicker({
+    format: 'DD-MM-YYYY H:mm',
     locale: 'ru',
     defaultDate:new Date()
     });
