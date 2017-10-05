@@ -75,7 +75,7 @@
         DateFrom
         <input class="form-control datetimepicker" name="date">
     </div>
-    <div class="col-md-3">
+    <div class="col-md-3" id="dateTo">
         DateTo
         <input class="form-control datetimepicker" name="dateTo">
     </div>
@@ -173,7 +173,10 @@
     if ($("#task").val() == '8') {
     $('#account').val('');
     $('#accountForm').show();
+    } else if($("#task").val() == '2'){
+    $("#dateTo").show();
     } else {
+    $("#dateTo").hide();
     $('#account').val('');
     $('#accountForm').hide();
     }

@@ -25,38 +25,38 @@ class AddTaskController extends Controller
             foreach ($tasks as $task) {
                 //print_r($task);
                 if ($task->task == 2) {
-                    //                    if ($task->count == 0) {
-                    //                        $start = true;
-                    //                    } else {
-                    $d1 = strtotime($task->dateTo);
-                    $d2 = strtotime($task->date);
-                    $diff = $d2 - $d1;
-                    $diff = $diff / (60 * 60);
-                    $hours = floor($diff);
-                    echo "Hours:" . $hours;
-                    $result = round($hours / 2);
-                    if ($task->count > $result) {
+                    if ($task->count == 0) {
                         $start = true;
                     } else {
-                        $d1 = strtotime(date("Y-m-d H:i:s"));
-                        $d2 = strtotime($task->dateUpdate);
-                        $diff = $d1 - $d2;
-                        $diff = $diff / (60 * 60);
+                        $d1 = strtotime($task->dateTo);
+                        $d2 = strtotime($task->date);
+                        $diff = $d2 - $d1;
+                        $diff = $diff / 60;
                         $hours = floor($diff);
-                        if ($hours >= 2) {
+                        echo "Hours:" . $hours;
+                        $result = round($hours / 30);
+                        if ($task->count > $result) {
                             $start = true;
                         } else {
-                            $start = false;
+                            $d1 = strtotime(date("Y-m-d H:i:s"));
+                            $d2 = strtotime($task->dateUpdate);
+                            $diff = $d1 - $d2;
+                            $diff = $diff / 60;
+                            $hours = floor($diff);
+                            if ($hours >= 30) {
+                                $start = true;
+                            } else {
+                                $start = false;
+                            }
+                            echo "\nlastUpdate:" . $hours;
+                            echo "\nNow:" . date("Y-m-d H:i:s");
                         }
-                        echo "\nlastUpdate:" . $hours;
-                        echo "\nNow:" . date("Y-m-d H:i:s");
                     }
-                    //                    }
                 } else {
                     $start = true;
                 }
-    
-    
+                
+                
                 if ($start === true) {
                     $model = Users::findOne($task->user);
                     $model->task = $task->task;
@@ -66,7 +66,7 @@ class AddTaskController extends Controller
                     $model->day = date('Y-m-d');
                     $model->scheduler = $task->id;
                     $model->update();
-        
+                    
                     $task->status = 1;
                     $task->count += 1;
                     $task->update();
