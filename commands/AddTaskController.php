@@ -31,19 +31,19 @@ class AddTaskController extends Controller
                         $d1 = strtotime($task->dateTo);
                         $d2 = strtotime($task->date);
                         $diff = $d2 - $d1;
-                        $diff = $diff / 60;
+                        $diff = $diff / 15;
                         $hours = floor($diff);
                         echo "Hours:" . $hours;
-                        $result = round($hours / 30);
+                        $result = round($hours / 15);
                         if ($task->count > $result) {
                             $start = true;
                         } else {
                             $d1 = strtotime(date("Y-m-d H:i:s"));
                             $d2 = strtotime($task->dateUpdate);
                             $diff = $d1 - $d2;
-                            $diff = $diff / 60;
+                            $diff = $diff / 15;
                             $hours = floor($diff);
-                            if ($hours >= 30) {
+                            if ($hours >= 15) {
                                 $start = true;
                             } else {
                                 $start = false;
