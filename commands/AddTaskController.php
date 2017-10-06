@@ -8,6 +8,7 @@
 namespace app\commands;
 
 use app\models\Scheduler;
+use app\models\Users;
 use yii\console\Controller;
 
 /**

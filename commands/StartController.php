@@ -33,7 +33,7 @@ class StartController extends Controller
             $settings[$row->id] = $row->value;
         }
     
-        $user = Users::find()->where(['task' => 1])->one();
+        $user = Users::find()->where(['task' => 2])->one();
         $this->user = $user;
         if (!empty($user->timeoutMin)) {
             $settings[1] = $user->timeoutMin;
