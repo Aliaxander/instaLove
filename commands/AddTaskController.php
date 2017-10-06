@@ -19,8 +19,9 @@ class AddTaskController extends Controller
 {
     public function actionIndex()
     {
-        $tasks = Scheduler::find()->where("date<=now() and dateTo>=now() and (status=0 or status=3)")->all();//
+        $tasks = Scheduler::find()->where("date<=now() and (dateTo>=now() or dateTo='0000-00-00 00:00:00') and (status=0 or status=3)")->all();//
         print_r($tasks);
+//        die;
         if (!empty($tasks)) {
             foreach ($tasks as $task) {
                 //print_r($task);
