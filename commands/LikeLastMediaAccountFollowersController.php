@@ -43,6 +43,8 @@ class LikeLastMediaAccountFollowersController extends Controller
                 'id' => $user->scheduler
             ])->one();
             $searchAccount = file_get_contents('https://www.instagram.com/' . $calendar->account . '/?__a=1');
+            $calendar->status = 1;
+            $calendar->update();
             $searchAccount = @json_decode($searchAccount);
             if (!empty($searchAccount)) {
                 $followAccountId = $searchAccount->user->id;
