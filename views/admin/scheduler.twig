@@ -13,9 +13,9 @@
             <td id="editTd-{{ scheduler.id }}">
                 {% if scheduler.status==0 %}
                     <div id="edit-{{ scheduler.id }}"
-                         onclick="edit({{ scheduler.id }})">{{ scheduler.date|date("d-m-Y h:i") }}</div>
+                         onclick="edit({{ scheduler.id }})">{{ scheduler.date|date("d-m-Y H:i") }}</div>
                 {% else %}
-                    {{ scheduler.date|date("d-m-Y h:i") }}
+                    {{ scheduler.date|date("d-m-Y H:i") }}
                 {% endif %}
             </td>
             <td>

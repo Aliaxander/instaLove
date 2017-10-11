@@ -20,7 +20,7 @@ class AddTaskController extends Controller
 {
     public function actionIndex()
     {
-        $tasks = Scheduler::find()->where("date<=now() and (dateTo>=now() or dateTo='0000-00-00 00:00:00') and (status=0 or status=3)")->all();//
+        $tasks = Scheduler::find()->where("date<=now() and (dateTo>=now() or dateTo='0000-00-00 00:00:00' or dateTo=date) and (status=0 or status=3)")->all();//
         print_r($tasks);
 //        die;
         if (!empty($tasks)) {
@@ -33,19 +33,19 @@ class AddTaskController extends Controller
                         $d1 = strtotime($task->dateTo);
                         $d2 = strtotime($task->date);
                         $diff = $d2 - $d1;
-                        $diff = $diff / 15;
+                        $diff = $diff / 30;
                         $hours = floor($diff);
                         echo "Hours:" . $hours;
-                        $result = round($hours / 15);
+                        $result = round($hours / 30);
                         if ($task->count > $result) {
                             $start = true;
                         } else {
                             $d1 = strtotime(date("Y-m-d H:i:s"));
                             $d2 = strtotime($task->dateUpdate);
                             $diff = $d1 - $d2;
-                            $diff = $diff / 15;
+                            $diff = $diff / 30;
                             $hours = floor($diff);
-                            if ($hours >= 15) {
+                            if ($hours >= 30) {
                                 $start = true;
                             } else {
                                 $start = false;

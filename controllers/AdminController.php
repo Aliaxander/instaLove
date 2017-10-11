@@ -140,6 +140,7 @@ class AdminController extends Controller
             $data->task = Yii::$app->request->post('task');
             $data->user = Yii::$app->request->post('user');
             $data->account = Yii::$app->request->post('account');
+            print_r($data);
             $data->save();
         }
         
